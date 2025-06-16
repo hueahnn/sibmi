@@ -1,6 +1,5 @@
 import os
 PLASMIDS = os.listdir("fasta-inputs")
-print(PLASMIDS)
 rule all:
     input: expand("results/{plasmid}", plasmid = PLASMIDS)
 rule annotate:
