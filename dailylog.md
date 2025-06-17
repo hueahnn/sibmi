@@ -90,6 +90,8 @@ Tomorrow:
 
 - Implementing cluster job submission feature, to call:
 `snakemake --use-conda --profile slurmprofile -p --keep-going --rerun-incomplete --executor slurm`
+- O2 has been down :( sbatch still pending but see if the call works, next step is run with more files. To sample a random cluster of files from a directory: 
+`ls <file directory> | shuf | head`
 
 
 
