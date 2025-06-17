@@ -27,7 +27,7 @@ Getting set up with Arya:
   - Documentation: https://snakemake.readthedocs.io/en/stable/tutorial/setup.html 
   - Example: https://github.com/karel-brinda/MiniPhy/ 
   - Read through snakemake documentation
-- PlasmidScope Database
+- [PlasmidScope](https://plasmid.deepomics.org/download#gbk) Database
   - About: https://plasmid.deepomics.org/tutorial 
 - bakta annotation software: https://github.com/oschwengers/bakta
   - bakta DB path on o2: /n/data1/hms/dbmi/baym/databases/bakta_dbv6/db
@@ -84,6 +84,12 @@ Tomorrow:
 - Works for one file, generalized to 2 then 8
   - When running 8 got a memory error → either increase the memory (>16G) or decrease the core (was running on 4, decreased to 2 which was much slower but ran through the end)
   - 8 complete → but took a while, generalize to larger batches by having each call submit a new sbatch job
+- Arya sent his code for submitting cluster jobs within a snakemake call
+
+# Jun 17, 2025
+
+- Implementing cluster job submission feature, to call:
+`snakemake --use-conda --profile slurmprofile -p --keep-going --rerun-incomplete --executor slurm`
 
 
 

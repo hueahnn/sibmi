@@ -4,9 +4,9 @@ rule all:
     input: expand("results/{plasmid}", plasmid = PLASMIDS)
 rule annotate:
     input: 
-        "fasta-inputs/{plasmid}"
+        "fasta-inputs-2/{plasmid}"
     output:
         directory("results/{plasmid}")
     conda: "bakta.yaml"
     shell:
-        "bakta --db /n/data1/hms/dbmi/baym/databases/bakta_dbv6/db {input} --output {output}"
+        "bakta --db /n/data1/hms/dbmi/baym/databases/bakta_dbv6/db {input} --output {output} --meta"
