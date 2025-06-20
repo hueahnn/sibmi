@@ -93,5 +93,16 @@ Tomorrow:
 - O2 has been down :( sbatch still pending but see if the call works, next step is run with more files. To sample a random cluster of files from a directory: 
 `ls <file directory> | shuf | head`
 
+# Jun 20, 2025
+
+- Breakdown of project in steps:
+  1. Set up
+  2. Annotations --> download all meta data and use pandas to filter through for only the complete and circular sequences.
+  3. Find insertion sequences and ORIs
+  4. Of the heterodimers, filter out ones with the specific topology of IS ORI IS ORI
+- To do list for today: 
+  - Get Snakefile to work for large datasets (having each bakta call submit a sbatch job to the cluster)
+  - Set up pandas and Jupyter and filter through the metadata (and download the metadata onto the cluster)
+
 
 

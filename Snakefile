@@ -6,7 +6,7 @@ rule annotate:
     input: 
         "fasta-inputs-2/{plasmid}"
     output:
-        directory("results/{plasmid}")
+        "results/{plasmid}/{plasmid}.gbff"
     conda: "bakta.yaml"
     shell:
-        "bakta --db /n/data1/hms/dbmi/baym/databases/bakta_dbv6/db {input} --output {output} --meta"
+        "bakta --db /n/data1/hms/dbmi/baym/databases/bakta_dbv6/db {input} --output $(dirname {output}) --meta --force"
