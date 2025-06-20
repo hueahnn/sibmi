@@ -95,6 +95,9 @@ Tomorrow:
 
 # Jun 20, 2025
 
+- More on the background of the project and the so what:
+  - Want to see the how prevalent heterodimerization due to insertion sequences are amongst all heterodimers
+  - AMR genes historically were more prevalent on the chromosome but since the introduction of antibiotics have been moved to plasmids. 
 - Breakdown of project in steps:
   1. Set up
   2. Annotations --> download all meta data and use pandas to filter through for only the complete and circular sequences.
@@ -103,6 +106,10 @@ Tomorrow:
 - To do list for today: 
   - Get Snakefile to work for large datasets (having each bakta call submit a sbatch job to the cluster)
   - Set up pandas and Jupyter and filter through the metadata (and download the metadata onto the cluster)
+    - Instead of using the OS package, use pandas to extract the names of the files
+- Snakemake command: `snakemake --profile slurmprofile --rerun-incomplete --use-conda --executor slurm`
+- For exporting a conda env to a JupyterLab kernel: `python -m ipykernel install --user --name=firstEnv`
+
 
 
 
