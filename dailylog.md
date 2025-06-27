@@ -188,3 +188,5 @@ Priority List:
   - Tweak Snakefile to read in seqs from txt file and test batch on SLURM with 100+ seqs
 - Install OriVFinder on o2
 
+To do:
+- Testing 15 files right now, if successful launch job with 100 files and let it run over the weekend. 

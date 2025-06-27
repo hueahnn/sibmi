@@ -1,17 +1,20 @@
 import os
-PATH = "first-week/fasta-inputs-2"
-PLASMIDS = [f.replace(".fasta", "") for f in os.listdir(PATH) if f.endswith(".fasta")]
+PATH = "bakta-annotations"
+INPUT_FILE = "062725.inputs.15.txt"
+IDS = []
+with open(INPUT_FILE, 'r') as f:
+    IDS = [line.strip() for line in f if line.strip()]
 
 def main_dir(child):
     return os.path.join(PATH, child)
 
 rule all:
-    input: expand("first-week/results/{plasmid}/{plasmid}.gbff", plasmid = PLASMIDS)
+    input: expand("{path}/results/{plasmid}/{plasmid}.gbff", path = PATH, plasmid = IDS)
 rule annotate:
-    input: 
-        "first-week/fasta-inputs-2/{plasmid}.fasta"
+    input:
+        lambda wildcards: f"{wildcards.path}/../fasta-files/{wildcards.plasmid.split('_')[0]}/fasta/{wildcards.plasmid}.fasta"
     output:
-        "first-week/results/{plasmid}/{plasmid}.gbff"	
+        "{path}/results/{plasmid}/{plasmid}.gbff"
     conda: "conda-envs/bakta.yaml"
     shell:
         "bakta --db /n/data1/hms/dbmi/baym/databases/bakta_dbv6/db {input} --output $(dirname {output}) --meta --force"
