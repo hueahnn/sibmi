@@ -183,5 +183,8 @@ To do:
 Priority List:
 - Submit annotation job with 100+ seqs
   - Create a script to parse through all seqs and filter only for complete and circular seqs. Also tsv only contains seqIDs, need to somehow obtain the associated fasta file.
+  - Can obtain fasta file by appending .fasta to the end of the seqID and downloading the databases
+  - Combine all the files from the databases into one directory and make sure they all have the same extension
+  - Tweak Snakefile to read in seqs from txt file and test batch on SLURM with 100+ seqs
 - Install OriVFinder on o2
 
