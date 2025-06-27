@@ -110,6 +110,78 @@ Tomorrow:
 - Snakemake command: `snakemake --profile slurmprofile --rerun-incomplete --use-conda --executor slurm`
 - For exporting a conda env to a JupyterLab kernel: `python -m ipykernel install --user --name=firstEnv`
 
+# Jun 23, 2025
+
+- Potential issues + cause of issues:
+  - User was renamed at some point in time and that is screwing up the admin rights and read/write permissions
+  - Also wsl may potentially be corrupted but uninstalling wsl would remove all the packages and other data associated with it
+- Task for the week while O2 is down: create a workflow for the downstream analysis of the annotated sequences
+  - Identify ORIs and IS using built software
+    - OriV-Finder, ISEScan, ABRicate
+  - Figure out a way to index the features so that only ones that have the correct topology of ORI IS ORI IS can be filtered out
+  - Test on the 3 sequences pulled from literature that are confirmed to have the specific sequence we are looking for.
+  - Make this into a snakefile
+- Test batch 3 seqs from the papers
+  - Done finding ORIs and ISes
+  - How am I actually going to implement finding the correct pattern?
+    - Key features: same IS seen 2+ times, ORI sandwiched between any of the same repeating IS
+
+# Jun 24, 2025
+
+- Abricate → used to find ORIs (for now)
+  - Example usage: abricate --db plasmidfinder fusion-seqs/*.fasta > ORIs.tsv
+- Approach to finding the heterodimers of our interest
+  - Determine the number of class changes (don’t want any that have 2 or less)
+- Steps:
+  - First compile the results into one big .tsv file and do some filtering with pandas
+    - Ex: filter out any IS that only show up once
+  - Since all the positions exist, can determine the order of the features and look how many “class changes” occurs for each IS
+  - Positive controls: the 3 plasmids from literature, neg control: the monomers from literature
+- Snakefile to do:
+  - Run abricate on all files to find ORIs
+  - Run ISEScan on all files to find IS and compile all results into one .tsv file
+  - Run heterodimer-finder.py script
+- Application of project to antibacterial resistance
+  - Can run plasmids through AMRfinder and can present a summary finding of there are this many plasmids that gained AMR genes through plasmid dimerization via IS
+
+# Jun 25, 2025
+
+- Finished heterodimer-finder.py
+- Working on Snakefile
+- ISEScan not working for some reason → troubleshoot
+- Problem:
+  - 2 of 3 positive controls successfully identified, however one failed because none of the IS identified in the paper were identified by ISEScan
+  - Fix: BLAST search using ISEFinder database
 
 
+# Jun 26, 2025
+
+- Generalize heterodimer-finder.py to 2 scenarios:
+  - Aggregated file with information about multiple sequences
+  - For a single plasmid
+- ISEScan not working… made a new conda env with only ISEScan and this seems to be working
+- Snakefile fixed and working
+  - 2 ways of finding IS: ISEScan or BLAST search using ISEFinder database
+- Problem: one of the negative controls is being picked up as a sequence of interest
+  - Not a problem → not uncommon to have multiple origins and could be sandwiched between ins seqs by chance
+  - Also, we don’t know for certain this is a negative control. 
+- Co-occurrence of ORIs → what’s rare what’s not
+- 2-step BLAST: one of each sequence against the ISFinder database, then the result of each of that (the ones with multiple occurrences) extract the sequence and pairwise BLAST (because there may be subtypes)
+
+To do:
+- Annotations with bakta → o2
+  - Fix Snakefile and start running on a larger set of seqs (maybe 100 or so)
+- Pairwise BLAST → find subtypes for each IS
+  - Output tsv file from initial BLAST has no headers… this is annoying → guide
+  - Make tweaks to heterodimer-finder.py to support BLAST output
+- Analyze co-occurrence frequency of identified ORIs 
+- Install OriVFinder on o2
+  - Change Snakefile accordingly
+
+# Jun 27, 2025
+
+Priority List:
+- Submit annotation job with 100+ seqs
+  - Create a script to parse through all seqs and filter only for complete and circular seqs. Also tsv only contains seqIDs, need to somehow obtain the associated fasta file.
+- Install OriVFinder on o2
 
