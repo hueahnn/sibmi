@@ -1,14 +1,17 @@
-import pandas as pd
-t = pd.read_tsv("ALL.plasmid_list.download.tsv")
-filtered = t[(t["Topology"] == "circular") & (t["Completeness"] == "complete")]
-PLASMIDS = filtered["Plasmid_ID"]
+import os
+PATH = "first-week/fasta-inputs-2"
+PLASMIDS = [f.replace(".fasta", "") for f in os.listdir(PATH) if f.endswith(".fasta")]
+
+def main_dir(child):
+    return os.path.join(PATH, child)
+
 rule all:
-    input: expand("results/{plasmid}/{plasmid}.gbff", plasmid = PLASMIDS)
+    input: expand("first-week/results/{plasmid}/{plasmid}.gbff", plasmid = PLASMIDS)
 rule annotate:
     input: 
-        "fasta-inputs-2/{plasmid}"
+        "first-week/fasta-inputs-2/{plasmid}.fasta"
     output:
-        "results/{plasmid}/{junk}.gbff"
-    conda: "bakta.yaml"
+        "first-week/results/{plasmid}/{plasmid}.gbff"	
+    conda: "conda-envs/bakta.yaml"
     shell:
-        "bakta --db /n/data1/hms/dbmi/baym/databases/bakta_dbv6/db {input} --output {output} --meta --force"
+        "bakta --db /n/data1/hms/dbmi/baym/databases/bakta_dbv6/db {input} --output $(dirname {output}) --meta --force"
