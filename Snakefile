@@ -1,6 +1,6 @@
 import os
 PATH = "bakta-annotations"
-INPUT_FILE = "062725.inputs.15.txt"
+INPUT_FILE = "filtered.plasmid.fasta.txt"
 IDS = []
 with open(INPUT_FILE, 'r') as f:
     IDS = [line.strip() for line in f if line.strip()]
