@@ -190,3 +190,11 @@ Priority List:
 
 To do:
 - Testing 15 files right now, if successful launch job with 100 files and let it run over the weekend. 
+# Jun 28, 2025
+- 1000 worked successfully. Running with all ~75,000 however am missing some input seqs:
+  - mMGEs_DRR003613_141_31316_r1256~5754148
+  - mMGEs_DRR003613_141_31340_r1256~1018561  
+  - mMGEs_DRR003614_141_36435_r1256~4396190
+  - mMGEs_DRR003616_119_25658_r1256~3570481
+  - mMGEs_DRR003616_119_25665_r1256~3570484
+
