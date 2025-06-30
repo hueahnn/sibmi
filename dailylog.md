@@ -126,6 +126,7 @@ Tomorrow:
   - How am I actually going to implement finding the correct pattern?
     - Key features: same IS seen 2+ times, ORI sandwiched between any of the same repeating IS
 
+
 # Jun 24, 2025
 
 - Abricate → used to find ORIs (for now)
@@ -143,6 +144,7 @@ Tomorrow:
   - Run heterodimer-finder.py script
 - Application of project to antibacterial resistance
   - Can run plasmids through AMRfinder and can present a summary finding of there are this many plasmids that gained AMR genes through plasmid dimerization via IS
+
 
 # Jun 25, 2025
 
@@ -178,6 +180,7 @@ To do:
 - Install OriVFinder on o2
   - Change Snakefile accordingly
 
+
 # Jun 27, 2025
 
 Priority List:
@@ -190,11 +193,32 @@ Priority List:
 
 To do:
 - Testing 15 files right now, if successful launch job with 100 files and let it run over the weekend. 
+
+
 # Jun 28, 2025
+
 - 1000 worked successfully. Running with all ~75,000 however am missing some input seqs:
   - mMGEs_DRR003613_141_31316_r1256~5754148
   - mMGEs_DRR003613_141_31340_r1256~1018561  
   - mMGEs_DRR003614_141_36435_r1256~4396190
   - mMGEs_DRR003616_119_25658_r1256~3570481
   - mMGEs_DRR003616_119_25665_r1256~3570484
+  - mMGEs_DRR003622_141_101836_r1256~2120518
+
+# Jun 30, 2025
+
+- mMGE missing file problem is because the directory name doesn't match the input names
+- bakta annotations are running --> will take a while to finish running
+  - had to increase memory to 24G bc some of the jobs were failing
+  - instead of submiting one bakta per job, find a way to submit multiple baktas per job so that the queue doesn't get clogged up like today (the higher beings of o2 are pissed off rn ☹️. 
+TODO:
+- Run initial screen using abricate and ISEScan to get a preliminary dataset
+  - Fix Snakefile to deal with the scenario in which ISEScan doesn't find any IS and returns no output files (workaround is expanding the directory in rule all)
+- Install OriVFinder and update Snakefile accordingly 
+  - asked o2 ppl for help, awaiting response
+- Script for pairwise BLAST and figuring out which IS are pairs/unique
+  - collapse duplicates (take the highest bitscore for seqs with multiple hits at the same location). filter out high e-vals. run pairwise BLAST searches on unique IDs
+
+
+
 
