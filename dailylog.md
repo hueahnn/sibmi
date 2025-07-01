@@ -205,12 +205,14 @@ To do:
   - mMGEs_DRR003616_119_25665_r1256~3570484
   - mMGEs_DRR003622_141_101836_r1256~2120518
 
+
 # Jun 30, 2025
 
 - mMGE missing file problem is because the directory name doesn't match the input names
 - bakta annotations are running --> will take a while to finish running
   - had to increase memory to 24G bc some of the jobs were failing
-  - instead of submiting one bakta per job, find a way to submit multiple baktas per job so that the queue doesn't get clogged up like today (the higher beings of o2 are pissed off rn ☹️. 
+  - instead of submiting one bakta per job, find a way to submit multiple baktas per job so that the queue doesn't get clogged up like today (the higher beings of o2 are pissed off rn ☹️). 
+
 TODO:
 - Run initial screen using abricate and ISEScan to get a preliminary dataset
   - Fix Snakefile to deal with the scenario in which ISEScan doesn't find any IS and returns no output files (workaround is expanding the directory in rule all)
@@ -219,6 +221,21 @@ TODO:
 - Script for pairwise BLAST and figuring out which IS are pairs/unique
   - collapse duplicates (take the highest bitscore for seqs with multiple hits at the same location). filter out high e-vals. run pairwise BLAST searches on unique IDs
 
+
+# Jul 1, 2025
+
+- Heterodimer Problems:
+  - BLAST broken... look into this (.blast.tsv files are empty)
+  - Figure out how to skip seqs without insertion sequences-- ISEScan returns no output files for these
+- Lower priority item: parsing through initial BLAST output, create a script to run pairwise BLASTs
+
+Worklog:
+- Ran 1000 bakta jobs, running another 1000 rn that is stuck in the queue
+- Fixed heterodimer-finder.py script, running on 100 seqs
+
+TODO:
+- Keep running bakta jobs + keep running heterodimer-finder.py
+- Start working on BLAST script while jobs are running tomorrow.
 
 
 
