@@ -236,6 +236,9 @@ Worklog:
 TODO:
 - Keep running bakta jobs + keep running heterodimer-finder.py
 - Start working on BLAST script while jobs are running tomorrow.
-
+- How to look for plasmid fusion events --> looking for plasmids comprised of 2 distinct plasmids 
+  - Lineage info may already exist, look into this
+  - Can also BLAST, depends on how many plasmids get filtered out
+- Slack lab person in Norway who studies plasmids
 
 
