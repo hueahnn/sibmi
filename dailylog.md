@@ -241,4 +241,17 @@ TODO:
   - Can also BLAST, depends on how many plasmids get filtered out
 - Slack lab person in Norway who studies plasmids
 
+# Jul 2, 2025
+
+- Bakta annotations are halfway done, ran overnight and currently at 35064 
+- Out of 1000 seqs passed through heterodimer-finder only 22 have the pattern we are looking for --> although this is using ISEScan
+
+TODO:
+- Prelim results from 1000 random seqs:
+  - How many have multiple origins and chart of co-occurence of origins
+- Harvard geneious license
+
+- Turns out abricate did not do a very good job at finding the origins... wait for OriVFinder to be installed.
+  - 22 seqs had the wanted feature, only 46 of the 1000 seqs had 2+ origins... should be around 1/3
+
 
