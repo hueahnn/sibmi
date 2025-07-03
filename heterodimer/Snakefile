@@ -1,0 +1,60 @@
+# author: hueahnn
+# begin: 06/25/2025
+# purpose: for a directory of plasmid fasta files identifies the ORIs + ins seqs and outputs plasmids with 2 or more class changes
+
+import os
+INPUT_PATH = "../062725.inputs.1000.txt"
+PATH = "heterodimer"
+# PLASMIDS = [f.replace(".fasta", "") for f in os.listdir(INPUT_PATH) if f.endswith(".fasta")]
+PLASMIDS = []
+with open(INPUT_PATH, "r") as f:
+    PLASMIDS = [line.strip() for line in f if line.strip()]
+
+def main_dir(child):
+    return os.path.join(PATH, child)
+
+rule all:
+    input: 
+        expand(main_dir("ORIs/{plasmid}.ORIs.tsv"), plasmid = PLASMIDS),
+        expand(main_dir("{plasmid}/fasta/{plasmid}.fasta.tsv"), path = PATH, plasmid = PLASMIDS), # for isescan
+        expand(main_dir("{plasmid}.blast.tsv"), plasmid = PLASMIDS), # for BLASTing ins seqs
+        expand("{path}/{plasmid}-heterodimer-outputs.txt", path = PATH, plasmid = PLASMIDS)
+
+rule abricate:
+    input: 
+        lambda wildcards: f"../fasta-files/{wildcards.plasmid.split('_')[0]}/fasta/{wildcards.plasmid}.fasta"
+    output: main_dir("ORIs/{plasmid}.ORIs.tsv")
+    conda: "../conda-envs/features.yaml"
+    shell:
+        "abricate --db plasmidfinder {input} > {output}"
+
+rule isescan:
+    input: 
+        lambda wildcards: f"../fasta-files/{wildcards.plasmid.split('_')[0]}/fasta/{wildcards.plasmid}.fasta"
+    output: "{path}/{plasmid}/fasta/{plasmid}.fasta.tsv"
+    conda: "../conda-envs/isescan.yaml"
+    run:
+        output_path = f"{wildcards.path}/{wildcards.plasmid}/fasta/{wildcards.plasmid}.fasta.tsv"
+        shell("isescan.py --seqfile {input} --output {wildcards.path}/{wildcards.plasmid} --removeShortIS")
+        if not os.path.exists(output_path):
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            open(output_path, "w").close()
+
+rule blast_ins_seqs:
+    input: 
+        lambda wildcards: f"../fasta-files/{wildcards.plasmid.split('_')[0]}/fasta/{wildcards.plasmid}.fasta"
+    output: main_dir("{plasmid}.blast.tsv")
+    conda: "../conda-envs/blast.yaml"
+    shell: "blastn -db isdb/isfinder -query {input} -out {output} -outfmt 6"
+
+rule class_changes:
+    input: 
+        main_dir("{plasmid}/fasta/{plasmid}.fasta.tsv"), 
+        main_dir("ORIs/{plasmid}.ORIs.tsv")
+    output: "{path}/{plasmid}-heterodimer-outputs.txt"
+    conda: "../conda-envs/features.yaml"
+    shell: "python heterodimer-finder.py single {wildcards.path} {wildcards.plasmid}"
+
+
+
+
