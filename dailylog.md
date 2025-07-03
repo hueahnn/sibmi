@@ -254,4 +254,13 @@ TODO:
 - Turns out abricate did not do a very good job at finding the origins... wait for OriVFinder to be installed.
   - 22 seqs had the wanted feature, only 46 of the 1000 seqs had 2+ origins... should be around 1/3
 
+# Jul 3, 2025
+
+TODO:
+- blast.py and ORI co-occurence table
+  - for the ORI co-occurence table need 2 things rn, frequency chart of how often 2 ORIs occur together and a freq chart of how often an ORI appears.
+later:
+- dual boot ubuntu
+- Use Docker to run OriVFinder locally
+
 
