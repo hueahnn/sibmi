@@ -18,3 +18,4 @@ rule annotate:
     conda: "conda-envs/bakta.yaml"
     shell:
         "bakta --db /n/data1/hms/dbmi/baym/databases/bakta_dbv6/db {input} --output $(dirname {output}) --meta --force"
+
