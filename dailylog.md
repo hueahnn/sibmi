@@ -241,6 +241,7 @@ TODO:
   - Can also BLAST, depends on how many plasmids get filtered out
 - Slack lab person in Norway who studies plasmids
 
+
 # Jul 2, 2025
 
 - Bakta annotations are halfway done, ran overnight and currently at 35064 
@@ -254,6 +255,7 @@ TODO:
 - Turns out abricate did not do a very good job at finding the origins... wait for OriVFinder to be installed.
   - 22 seqs had the wanted feature, only 46 of the 1000 seqs had 2+ origins... should be around 1/3
 
+
 # Jul 3, 2025
 
 TODO:
@@ -263,4 +265,22 @@ later:
 - dual boot ubuntu
 - Use Docker to run OriVFinder locally
 
+
+# Jul 7, 2025
+
+- For blast.py, use the plasmid seq as the db and use each insertion sequence hit as the query. From this filter for percent identity > 90
+- 9 failed bakta jobs (PILER-CR error, error code: -11): skipping CRISPR for these ones...
+  1. mMGEs_k99_473275_r1256~1033030
+  2. COMPASS_KY595967.1
+  3. GenBank_CP082893.1
+  4. COMPASS_NC_020243.1
+  5. PLSDB_NZ_LR890507.1
+  6. GenBank_KY000037.1
+  7. GenBank_CP081352.1
+  8. GenBank_CP066478.1
+  9. GenBank_CP053913.1
+- Prioritize working on Docker, need preliminary results. If Docker is too much of a hassle, use MOB finder
+- Trying to figure out Docker and OriVFinder is taking years off my life... fully crashing out😵‍💫
+  - To run OriVFinder: `docker run -it --rm orivfinder-ready bash
+  - To execute command: `python oriVfinder.py --fasta /app/data/input.fasta --output_dir /app/data/output
 
