@@ -284,3 +284,13 @@ later:
   - To run OriVFinder: `docker run -it --rm orivfinder-ready bash
   - To execute command: `python oriVfinder.py --fasta /app/data/input.fasta --output_dir /app/data/output
 
+
+# Jul 8, 2025:
+
+- Can run OriVFinder on O2 with some tweaks --> already have bakta annotations so skip that step to save time
+- Try running OriVFinder locally using Docker to see what the output looks like
+- Integrate BLAST script to Snakefile and run it for all the plasmids (might want to comment out some of the rules)
+- Start thinking about final presentation and creating a compelling story.
+  - Take a look at the paper Kepler sent.
+- Order of business: get Snakefile with BLAST up and running, OriVFinder, have presentation in the back of mind.
+

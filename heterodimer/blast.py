@@ -62,7 +62,7 @@ def main(FILE_PATH):
             os.system(f"blastn -db blast-dbs/{plasmid} -query {temp_query_file} -outfmt 6 >> {PAIRWISE_OUTPUT_FILE}")
         reformat = pd.read_csv(PAIRWISE_OUTPUT_FILE, sep="\t", header=None)
         reformat.columns = ["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore"]
-        reformat = reformat[reformat.pident >= 90]
+        reformat = reformat[(reformat.pident >= 90) & (reformat.bitscore > 100)]
         reformat.to_csv(PAIRWISE_OUTPUT_FILE, sep="\t")
 
 
