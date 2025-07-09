@@ -9,13 +9,15 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
 
 def main(PLASMID):
-    # for a txt file with a list of plasmid ids
-    # PLASMIDS = []
-    # with open(PLASMID_PATH, "r") as f:
-    #     PLASMIDS = [line.strip() for line in f if line.strip()]
-
     # for each IS found, determine if they are in overlapping regions and for ones that are not run a pairwise BLAST to determine if they are the same
-        OUTPUT_FILE = f"/heterodimer/{PLASMID}.unique.hits.tsv"
+        OUTPUT_FILE = f"heterodimer/{PLASMID}.unique.hits.tsv"
+        open(OUTPUT_FILE, "w").close()
+        PAIRWISE_OUTPUT_FILE = f"heterodimer/{PLASMID}.pairwise.blast.tsv"
+        open(PAIRWISE_OUTPUT_FILE, "w").close()
+        # for files with no hits
+        BLAST_FILEPATH = f"heterodimer/{PLASMID}.blast.tsv"
+        if (os.path.getsize(BLAST_FILEPATH) == 0):
+            return
         df = pd.read_csv(f"heterodimer/{PLASMID}.blast.tsv", sep="\t", header=None)
         df.columns = ["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore"]
         df = df.sort_values("bitscore", ascending=False)
@@ -38,8 +40,6 @@ def main(PLASMID):
         unique.to_csv(OUTPUT_FILE, sep="\t")
         
         # step 2: for every unique insertion sequence, run a pairwise BLAST with all ins seq to determine if they actually are the same ins seq (cutoff 95%)
-        PAIRWISE_OUTPUT_FILE = f"heterodimer/{PLASMID}.pairwise.blast.tsv"
-        open(PAIRWISE_OUTPUT_FILE, "w").close()
         db = PLASMID.split('_')[0]
         fasta = f"../fasta-files/{db}/fasta/{PLASMID}.fasta"
         record = next(SeqIO.parse(fasta, "fasta"))
