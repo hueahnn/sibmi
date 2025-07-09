@@ -15,10 +15,11 @@ def main_dir(child):
 
 rule all:
     input: 
-        expand(main_dir("ORIs/{plasmid}.ORIs.tsv"), plasmid = PLASMIDS),
-        expand(main_dir("{plasmid}/fasta/{plasmid}.fasta.tsv"), path = PATH, plasmid = PLASMIDS), # for isescan
-        expand(main_dir("{plasmid}.blast.tsv"), plasmid = PLASMIDS), # for BLASTing ins seqs
-        expand("{path}/{plasmid}-heterodimer-outputs.txt", path = PATH, plasmid = PLASMIDS)
+        # expand(main_dir("ORIs/{plasmid}.ORIs.tsv"), plasmid = PLASMIDS), # rule abricate
+        expand(main_dir("{plasmid}/fasta/{plasmid}.fasta.tsv"), path = PATH, plasmid = PLASMIDS), # rule isescan
+        expand(main_dir("{plasmid}.blast.tsv"), plasmid = PLASMIDS), # rule blast_ins_seqs
+        expand(main_dir("{plasmid}.pairwise.blast.tsv"), plasmid = PLASMIDS), # rule blast_processing
+        # expand("{path}/{plasmid}-heterodimer-outputs.txt", path = PATH, plasmid = PLASMIDS) # rule class_changes
 
 rule abricate:
     input: 
@@ -47,6 +48,12 @@ rule blast_ins_seqs:
     conda: "../conda-envs/blast.yaml"
     shell: "blastn -db isdb/isfinder -query {input} -out {output} -outfmt 6"
 
+rule blast_processing:
+    input: main_dir("{plasmid}.blast.tsv") 
+    output: main_dir("{plasmid}.pairwise.blast.tsv")
+    conda: "../conda-envs/features.yaml"
+    shell: "python blast.py main {wildcards.plasmid}"
+
 rule class_changes:
     input: 
         main_dir("{plasmid}/fasta/{plasmid}.fasta.tsv"), 
@@ -54,7 +61,4 @@ rule class_changes:
     output: "{path}/{plasmid}-heterodimer-outputs.txt"
     conda: "../conda-envs/features.yaml"
     shell: "python heterodimer-finder.py single {wildcards.path} {wildcards.plasmid}"
-
-
-
 

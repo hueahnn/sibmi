@@ -8,64 +8,59 @@ from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
 
-def main(FILE_PATH):
-    #PLASMIDS = []
-    #with open(PLASMID_PATH, "r") as f:
-    #    PLASMIDS = [line.strip() for line in f if line.strip()]
+def main(PLASMID):
+    # for a txt file with a list of plasmid ids
+    # PLASMIDS = []
+    # with open(PLASMID_PATH, "r") as f:
+    #     PLASMIDS = [line.strip() for line in f if line.strip()]
 
     # for each IS found, determine if they are in overlapping regions and for ones that are not run a pairwise BLAST to determine if they are the same
-    PLASMIDS = ["DDBJ_AP017321.1"]
-    for plasmid in PLASMIDS:
-        df = pd.read_csv(f"{FILE_PATH}/{plasmid}.blast.tsv", sep="\t", header=None)
+        OUTPUT_FILE = f"/heterodimer/{PLASMID}.unique.hits.tsv"
+        df = pd.read_csv(f"heterodimer/{PLASMID}.blast.tsv", sep="\t", header=None)
         df.columns = ["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore"]
-        df = df[df.bitscore > 100]
         df = df.sort_values("bitscore", ascending=False)
         # df.to_csv("test.blast.tsv", sep="\t")
         unique = pd.DataFrame(columns=["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore"])
 
-        # step 1: some regions have several hits -- filter out these by checking the position of the region and only keep the highest bitscore hit
+        # step 1: some regions have several hits-- filter these out by checking the position of the region and only keep the highest bitscore hit
         skip = []
         for i in range(0,len(df)):
             if i in skip:
                 continue
             else:
                 temp = df.iloc[i]
-                unique.loc[len(unique)] = temp 
+                unique.loc[len(unique)] = temp
                 start = df.qstart.iat[i]
                 end = df.qend.iat[i]
                 for j in range(i,len(df)):
                     if (df.qend.iat[j] > start) & (df.qstart.iat[j] < end):
                         skip.append(j)
-        unique.to_csv("test.blast.tsv", sep="\t")
-        #with open("test.blast.tsv", "a") as f:
-            #print(unique, file=f)
+        unique.to_csv(OUTPUT_FILE, sep="\t")
         
-
-        # step 2: for every unique insertion sequence, run a pairwise BLAST on each pair to determine if they actually are the same ins seq (cutoff 90% or so)
-        plasmid = unique.qseqid.iat[0]
-        db = plasmid.split('_')[0]
-        PAIRWISE_OUTPUT_FILE = f"heterodimer/{plasmid}.pairwise.blast.tsv"
-        fasta = f"../fasta-files/{db}/fasta/{plasmid}.fasta"
+        # step 2: for every unique insertion sequence, run a pairwise BLAST with all ins seq to determine if they actually are the same ins seq (cutoff 95%)
+        PAIRWISE_OUTPUT_FILE = f"heterodimer/{PLASMID}.pairwise.blast.tsv"
         open(PAIRWISE_OUTPUT_FILE, "w").close()
-        # upload plasmid seq as db
-        os.system(f"makeblastdb -in {fasta} -dbtype nucl -out blast-dbs/{plasmid}")
+        db = PLASMID.split('_')[0]
+        fasta = f"../fasta-files/{db}/fasta/{PLASMID}.fasta"
         record = next(SeqIO.parse(fasta, "fasta"))
         sequence = str(record.seq)
+        # generate fasta file of hits
+        HITS_FILE = f"heterodimer/{PLASMID}.hits.fasta"
+        records = []
         for i in range(0,len(unique)):
             start = unique.qstart.iat[i]
             end = unique.qend.iat[i]
             ins_seq = sequence[min(start,end): max(start,end)]
-            # write to temp query file
-            temp_query_file = "temp_query.fasta"
-            SeqIO.write(SeqRecord(Seq(ins_seq), id=f"{plasmid}_{i}", description=""), temp_query_file, "fasta")
-            # run BLAST
-            os.system(f"blastn -db blast-dbs/{plasmid} -query {temp_query_file} -outfmt 6 >> {PAIRWISE_OUTPUT_FILE}")
+            record = SeqRecord(Seq(ins_seq), id=f"{unique.sseqid.iat[i]}_{i}", description="")
+            records.append(record)
+        SeqIO.write(records, HITS_FILE, "fasta")
+        # upload as db and run BLAST
+        os.system(f"makeblastdb -in {HITS_FILE} -dbtype nucl -out blast-dbs/{PLASMID}")
+        os.system(f"blastn -db blast-dbs/{PLASMID} -query {HITS_FILE} -outfmt 6 >> {PAIRWISE_OUTPUT_FILE}")
+        # reformat output
         reformat = pd.read_csv(PAIRWISE_OUTPUT_FILE, sep="\t", header=None)
         reformat.columns = ["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore"]
-        reformat = reformat[(reformat.pident >= 90) & (reformat.bitscore > 100)]
         reformat.to_csv(PAIRWISE_OUTPUT_FILE, sep="\t")
-
-
 
 
 if __name__ == "__main__":

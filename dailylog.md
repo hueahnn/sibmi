@@ -294,3 +294,13 @@ later:
   - Take a look at the paper Kepler sent.
 - Order of business: get Snakefile with BLAST up and running, OriVFinder, have presentation in the back of mind.
 
+
+# Jul 9, 2025:
+
+- Rewrite blast.py, create a fasta file of all the unique hits as the DB for the BLAST search and query each individual fasta file 
+- Check out PlasAnn output and determine which one to use as the ORI finder
+Progress:
+- Running blast.py on snakemake
+- Decide on OriVFinder vs PlasAnn for finding ORIs --> once this is decided can fix heterodimer-finder.py and get preliminary data. yay!! (also permitting that there are no issues with the Snakefile)
+
+
