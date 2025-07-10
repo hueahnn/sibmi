@@ -307,5 +307,9 @@ Progress:
 
 
 # Jul 10, 2025:
-- Work on OriVFinder for O2
 
+- Work on OriVFinder for O2
+- Good examples of pairwise BLAST outputs: 
+  - heterodimer/heterodimer/DDBJ_AP019793.1.pairwise.blast.tsv
+  - heterodimer/heterodimer/DDBJ_AP019544.1.pairwise.blast.tsv
+- Circle plot of association for ORIs

@@ -19,6 +19,7 @@ rule all:
         expand(main_dir("{plasmid}/fasta/{plasmid}.fasta.tsv"), path = PATH, plasmid = PLASMIDS), # rule isescan
         expand(main_dir("{plasmid}.blast.tsv"), plasmid = PLASMIDS), # rule blast_ins_seqs
         expand(main_dir("{plasmid}.pairwise.blast.tsv"), plasmid = PLASMIDS), # rule blast_processing
+        expand(main_dir("ORIs/{plasmid}/All_IGSs.csv"), plasmid = PLASMIDS), # rule orivfinder
         # expand("{path}/{plasmid}-heterodimer-outputs.txt", path = PATH, plasmid = PLASMIDS) # rule class_changes
 
 rule abricate:
@@ -28,6 +29,20 @@ rule abricate:
     conda: "../conda-envs/features.yaml"
     shell:
         "abricate --db plasmidfinder {input} > {output}"
+
+rule orivfinder:
+    input: 
+        lambda wildcards: f"../fasta-files/{wildcards.plasmid.split('_')[0]}/fasta/{wildcards.plasmid}.fasta"
+    output: 
+        main_dir("ORIs/{plasmid}/All_IGSs.csv")
+        main_dir("ORIs/{plasmid}/RIP.csv")
+    conda: "../conda-envs/orivfinder.yaml"
+    shell:
+        ""
+        python ../orivfinder/oriVfinder.py --fasta {input} --output_dir ../orivfinder/app/data/output
+        mkdir heterodimer/ORIs/{wildcards.plasmid}
+        mv ../orivfinder/app/data/output/All_IGSs.csv ../orivfinder/app/data/output/RIP.csv heterodimer/ORIs/{wildcards.plasmid}
+        ""
 
 rule isescan:
     input: 
