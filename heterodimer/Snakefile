@@ -34,15 +34,10 @@ rule orivfinder:
     input: 
         lambda wildcards: f"../fasta-files/{wildcards.plasmid.split('_')[0]}/fasta/{wildcards.plasmid}.fasta"
     output: 
-        main_dir("ORIs/{plasmid}/All_IGSs.csv")
+        main_dir("ORIs/{plasmid}/All_IGSs.csv"),
         main_dir("ORIs/{plasmid}/RIP.csv")
     conda: "../conda-envs/orivfinder.yaml"
-    shell:
-        ""
-        python ../orivfinder/oriVfinder.py --fasta {input} --output_dir ../orivfinder/app/data/output
-        mkdir heterodimer/ORIs/{wildcards.plasmid}
-        mv ../orivfinder/app/data/output/All_IGSs.csv ../orivfinder/app/data/output/RIP.csv heterodimer/ORIs/{wildcards.plasmid}
-        ""
+    shell: "python ../orivfinder/oriVfinder.py --fasta {input} --output_dir heterodimer/ORIs/{wildcards.plasmid}"
 
 rule isescan:
     input: 
