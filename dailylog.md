@@ -281,8 +281,8 @@ later:
   9. GenBank_CP053913.1
 - Prioritize working on Docker, need preliminary results. If Docker is too much of a hassle, use MOB finder
 - Trying to figure out Docker and OriVFinder is taking years off my life... fully crashing out😵‍💫
-  - To run OriVFinder: `docker run -it --rm orivfinder-ready bash
-  - To execute command: `python oriVfinder.py --fasta /app/data/input.fasta --output_dir /app/data/output
+  - To run OriVFinder: `docker run -it --rm orivfinder-ready bash`
+  - To execute command: `python oriVfinder.py --fasta /app/data/input.fasta --output_dir /app/data/output`
 
 
 # Jul 8, 2025:
@@ -299,8 +299,13 @@ later:
 
 - Rewrite blast.py, create a fasta file of all the unique hits as the DB for the BLAST search and query each individual fasta file 
 - Check out PlasAnn output and determine which one to use as the ORI finder
+- Good test case of insertion seqs: DDBJ_AP017321.1
+- Path to OriVFinder on O2: `/n/data1/hms/dbmi/baym/kepler/orivfinder/app`
 Progress:
 - Running blast.py on snakemake
 - Decide on OriVFinder vs PlasAnn for finding ORIs --> once this is decided can fix heterodimer-finder.py and get preliminary data. yay!! (also permitting that there are no issues with the Snakefile)
 
+
+# Jul 10, 2025:
+- Work on OriVFinder for O2
 

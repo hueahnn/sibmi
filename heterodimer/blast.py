@@ -58,9 +58,10 @@ def main(PLASMID):
         os.system(f"makeblastdb -in {HITS_FILE} -dbtype nucl -out blast-dbs/{PLASMID}")
         os.system(f"blastn -db blast-dbs/{PLASMID} -query {HITS_FILE} -outfmt 6 >> {PAIRWISE_OUTPUT_FILE}")
         # reformat output
-        reformat = pd.read_csv(PAIRWISE_OUTPUT_FILE, sep="\t", header=None)
-        reformat.columns = ["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore"]
-        reformat.to_csv(PAIRWISE_OUTPUT_FILE, sep="\t")
+        if (os.path.getsize(PAIRWISE_OUTPUT_FILE) != 0):
+            reformat = pd.read_csv(PAIRWISE_OUTPUT_FILE, sep="\t", header=None)
+            reformat.columns = ["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore"]
+            reformat.to_csv(PAIRWISE_OUTPUT_FILE, sep="\t")
 
 
 if __name__ == "__main__":
