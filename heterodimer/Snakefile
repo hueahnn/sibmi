@@ -3,7 +3,7 @@
 # purpose: for a directory of plasmid fasta files identifies the ORIs + ins seqs and outputs plasmids with 2 or more class changes
 
 import os
-INPUT_PATH = "../062725.inputs.1000.txt"
+INPUT_PATH = "../filtered.plasmid.fasta.txt"
 PATH = "heterodimer"
 # PLASMIDS = [f.replace(".fasta", "") for f in os.listdir(INPUT_PATH) if f.endswith(".fasta")]
 PLASMIDS = []
@@ -16,10 +16,11 @@ def main_dir(child):
 rule all:
     input: 
         # expand(main_dir("ORIs/{plasmid}.ORIs.tsv"), plasmid = PLASMIDS), # rule abricate
-        expand(main_dir("{plasmid}/fasta/{plasmid}.fasta.tsv"), path = PATH, plasmid = PLASMIDS), # rule isescan
+        # expand(main_dir("{plasmid}/fasta/{plasmid}.fasta.tsv"), path = PATH, plasmid = PLASMIDS), # rule isescan
         expand(main_dir("{plasmid}.blast.tsv"), plasmid = PLASMIDS), # rule blast_ins_seqs
         expand(main_dir("{plasmid}.pairwise.blast.tsv"), plasmid = PLASMIDS), # rule blast_processing
         expand(main_dir("ORIs/{plasmid}/All_IGSs.csv"), plasmid = PLASMIDS), # rule orivfinder
+        # expand(main_dir("ORIs/{plasmid}/Annotation_table_for_{plasmid}.csv"), plasmid = PLASMIDS), # rule plasann
         # expand("{path}/{plasmid}-heterodimer-outputs.txt", path = PATH, plasmid = PLASMIDS) # rule class_changes
 
 rule abricate:
@@ -38,6 +39,13 @@ rule orivfinder:
         main_dir("ORIs/{plasmid}/RIP.csv")
     conda: "../conda-envs/orivfinder.yaml"
     shell: "python ../orivfinder/oriVfinder.py --fasta {input} --output_dir heterodimer/ORIs/{wildcards.plasmid}"
+
+rule plasann:
+    input: 
+        lambda wildcards: f"../fasta-files/{wildcards.plasmid.split('_')[0]}/fasta/{wildcards.plasmid}.fasta"
+    output: main_dir("ORIs/{plasmid}/Annotation_table_for_{plasmid}.csv")
+    conda: "../conda-envs/plasann.yaml"
+    shell: "PlasAnn -i {input} -o heterodimer/ORIs -t fasta"
 
 rule isescan:
     input: 

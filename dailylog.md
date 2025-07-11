@@ -313,3 +313,17 @@ Progress:
   - heterodimer/heterodimer/DDBJ_AP019793.1.pairwise.blast.tsv
   - heterodimer/heterodimer/DDBJ_AP019544.1.pairwise.blast.tsv
 - Circle plot of association for ORIs
+
+
+# Jul 11, 2025:
+
+- Order of business:
+  - Run OriVFinder + BLAST ins seqs on all 75000 plasmids
+  - Figure out how many of the 1000 that already have run have non-empty files (for BLAST check if there are any outputs, for ORIs check how many type 1, type 1 or 2, and if there are multiple ORIs)
+  - Parse BLAST pairwise output (group ins seqs together)
+  - Update heterodimer-finder.py with new output formats
+  - Make presentation
+
+
+
+
