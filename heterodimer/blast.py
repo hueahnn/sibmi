@@ -7,6 +7,7 @@ import sys
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
+import string
 
 def main(PLASMID):
     # for each IS found, determine if they are in overlapping regions and for ones that are not run a pairwise BLAST to determine if they are the same
@@ -62,6 +63,90 @@ def main(PLASMID):
             reformat = pd.read_csv(PAIRWISE_OUTPUT_FILE, sep="\t", header=None)
             reformat.columns = ["qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore"]
             reformat.to_csv(PAIRWISE_OUTPUT_FILE, sep="\t")
+
+def parse(PLASMID):
+    # for all the pident 100, add unique ids to list
+    PAIRWISE_INPUT_FILE = f"heterodimer/{PLASMID}.pairwise.blast.tsv"
+    UNIQUE_INPUT_FILE = f"heterodimer/{PLASMID}.unique.hits.tsv"
+    OUTPUT_FILE = f"heterodimer/final/{PLASMID}.blast.tsv"
+    open(OUTPUT_FILE, "w").close()
+    if (os.path.getsize(PAIRWISE_INPUT_FILE) == 0):
+            return
+    pairwise_df = pd.read_csv(PAIRWISE_INPUT_FILE, sep="\t")
+    unique_df = pd.read_csv(UNIQUE_INPUT_FILE, sep="\t")
+    if "Unnamed: 0" in unique_df.columns:
+        unique_df = unique_df.drop(columns=["Unnamed: 0"])
+    groups = []
+    g = set()
+    for i in range(0,len(unique_df)):
+         same = []
+         s = set()
+         for j in range(0,len(pairwise_df)):
+            qid = pairwise_df.qseqid.iat[j].split("_")
+            qid = int(qid[len(qid)-1])
+            sid = pairwise_df.sseqid.iat[j].split("_")
+            sid = int(sid[len(sid)-1])
+            if i not in s:
+                same.append(i)
+                s.add(i)
+            if (qid==i) & (sid!=i):
+                same.append(sid)
+         same = sorted(same)
+         if tuple(same) not in g:
+            groups.append(same)
+            g.add(tuple(same))
+    append_group = [None]*len(unique_df)
+    gen = 0
+    for i in range(0,len(groups)):
+         for num in groups[i]:
+              append_group[num] = f"{PLASMID}_{gen}"
+         gen += 1
+    unique_df["group"] = append_group
+    unique_df.to_csv(OUTPUT_FILE,sep="\t",index=False)
+
+def parse_multiple(FILE):
+    PLASMIDS = []
+    with open(FILE, "r") as f:
+        PLASMIDS = [line.strip() for line in f if line.strip()]
+    for PLASMID in PLASMIDS:
+        PAIRWISE_INPUT_FILE = f"heterodimer/{PLASMID}.pairwise.blast.tsv"
+        UNIQUE_INPUT_FILE = f"heterodimer/{PLASMID}.unique.hits.tsv"
+        OUTPUT_FILE = f"heterodimer/final/{PLASMID}.blast.tsv"
+        open(OUTPUT_FILE, "w").close()
+        if (os.path.getsize(PAIRWISE_INPUT_FILE) == 0):
+            continue
+        pairwise_df = pd.read_csv(PAIRWISE_INPUT_FILE, sep="\t")
+        unique_df = pd.read_csv(UNIQUE_INPUT_FILE, sep="\t")
+        if "Unnamed: 0" in unique_df.columns:
+            unique_df = unique_df.drop(columns=["Unnamed: 0"])
+        groups = []
+        g = set()
+        for i in range(0,len(unique_df)):
+            same = []
+            s = set()
+            for j in range(0,len(pairwise_df)):
+                qid = pairwise_df.qseqid.iat[j].split("_")
+                qid = int(qid[len(qid)-1])
+                sid = pairwise_df.sseqid.iat[j].split("_")
+                sid = int(sid[len(sid)-1])
+                if i not in s:
+                    same.append(i)
+                    s.add(i)
+                if (qid==i) & (sid!=i):
+                    same.append(sid)
+            same = sorted(same)
+            if tuple(same) not in g:
+                groups.append(same)
+                g.add(tuple(same))
+        append_group = [None]*len(unique_df)
+        gen = 0
+        for i in range(0,len(groups)):
+         for num in groups[i]:
+              append_group[num] = f"{PLASMID}_{gen}"
+         gen += 1
+        unique_df["group"] = append_group
+        unique_df.to_csv(OUTPUT_FILE,sep="\t",index=False)
+
 
 
 if __name__ == "__main__":

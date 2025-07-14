@@ -325,5 +325,22 @@ Progress:
   - Make presentation
 
 
+# Jul 14, 2025:
+- Corrupted bakta annotation: COMPASS_NC_002664.1
+  - Removed from txt file for now
+- Another one corrupted: RefSeq_NZ_CP093161.1, this one is also a linear seq...
+- Problems:
+  - original tsv has a mix of tab separated and comma separated values
+  - BLAST is not hitting all transposases (532 of 1000 do not have transposases)
+- Make slides, Sneha visiting tmr
+- To do:
+  - fix origins.py
+  - fix heterodimer-finder.py
+
+
+
+
+
+
 
 
