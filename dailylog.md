@@ -340,8 +340,22 @@ Progress:
 
 # Jul 15, 2025:
 - fixed and ran heterodimer-finder.py --> out of 999 seqs, 224 have desired feature
+- `O2_jobs_report` to view memory usage and such
 
 
+# Jul 16, 2025:
+- How many have multiple ORIs? How many actual plasmids?
+  - 365 with multiple ORIs, 100 plasmids with desired feature, 224 hits across these 100
+  - Upper bound, haven't filtered the transposons. As a sanity check later on, plot lengths vs abundance and make sure that identified fusions have a longer length
+- Name proposal: TOTO
+Downstream analysis directions:
+- Determine cooccurence freq of ORIs to filter results for seqs that are actually meaningful (ORIs frequently coexisting is not interesting)
+  - Pull out ORI seq for every plasmid with 2+ ORIs and cluster at thresholds (70,80,90%) using mmseq2
+  - Build a heat map with every permutation of ORIs by searching for the existence of the pair in every plasmid
+- Are there any particular ISs that show up often?
+- How many of these are events in which AMR genes (AMRfinder) or mobilizable genes (MOBfinder) are present?
+To do:
+- clustering with mmseqs2 --> not sure how to interpret the output
 
 
 

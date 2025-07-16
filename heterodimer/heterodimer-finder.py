@@ -1,6 +1,6 @@
 # author: hueahnn
 # begin: 06/24/25
-# updated: 07/15/25
+# updated: 07/16/25
 # purpose: for filtering for the heterodimers of interest 
 import pandas as pd
 import os
@@ -30,8 +30,6 @@ def single(path, plasmid):
 def count(ins_seq_df, ori_df, output_file):
     open(output_file, "w").close()
     # filter out seqs with 1 IS and combine info into one df
-    # print(ins_seq_df)
-    # print(ori_df)
     ins_seq_df = ins_seq_df[ins_seq_df.copies > 1]
 
     # rename cols to match and combine the dfs into one df
@@ -41,10 +39,12 @@ def count(ins_seq_df, ori_df, output_file):
 
     # determine sequential order of features + number of class changes + output seqID
     total = 0
+    plasmids = 0
     for id in df["seqID"].unique():
         plasmid_df = df[df.seqID == id]
         plasmid_df = plasmid_df.sort_values("begin")
         is_only = plasmid_df[plasmid_df.type == "is"] 
+        first = 0
         for feat in is_only["feature"].unique():
             is_df = plasmid_df[(plasmid_df.type == "ori") | ((plasmid_df.feature == feat) & (plasmid_df.type == "is"))]
             changes = 0
@@ -59,11 +59,14 @@ def count(ins_seq_df, ori_df, output_file):
                     changes += 1
             if (changes > 2):
                 total+=1
+                if first==0:
+                    plasmids+=1
+                first+=1
                 with open(output_file, "a") as f:
                     print(f"{id}\t{feat}\t{changes}", file=f)
                     print(is_df, file=f)
     with open(output_file, "a") as f:
-        print(total,file=f)
+        print(f"plasmid hits: {plasmids}\ntotal hits: {total}",file=f)
 
 
 ### below is an implementation for running the script on one giant aggregated file containing the info for multiple plasmids instead of a single plasmid ###
@@ -99,9 +102,13 @@ def aggregated(FILE):
     ins_seq_df = ins_seq_df.rename(columns={"qseqid":"seqID","qstart":"begin", "qend":"end", "group":"feature"})
     ins_seq_df["type"] = "is"
     # do some filtering for eval, length, percent identity, and such?
+    IS_OUTPUT = "IS.summary.tsv"
+    ins_seq_df.to_csv(IS_OUTPUT, sep="\t", index=False)
     # put together ORI data
     ori_df = ori_df.rename(columns={"Intergenic_Start":"begin", "Intergenic_End":"end", "Accession_Number":"feature"})
     ori_df["type"] = "ori"
+    ORI_OUTPUT = "ORI.summary.tsv"
+    ori_df.to_csv(ORI_OUTPUT, sep="\t", index=False)
     # specify output file directory
     output_file = "heterodimer-outputs-1000.txt"
     count(ins_seq_df, ori_df, output_file)

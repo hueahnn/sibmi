@@ -1,33 +1,37 @@
 # author: hueahnn
 # begin: 07/02/2025
-# updated: 07/03/25
+# updated: 07/16/25
 # purpose: determine how many plasmids have multiple origins and the co-occurence of origins
 
 import pandas as pd
 import os
 import sys
 
-def main(PLASMID_PATH, FILE_PATH):
+def main(PLASMID_PATH):
+    OUTPUT_PATH = f"ORIs.summary.tsv"
+    COMBINED_PATH = f"ORIs.df.tsv"
     PLASMIDS = []
-    OUTPUT_PATH = f"{FILE_PATH}/ORIs.summary.tsv"
     with open(PLASMID_PATH, "r") as f:
         PLASMIDS = [line.strip() for line in f if line.strip()]
 
     # determine how many plasmids have multiple origins
     counter = 0 # counter for how many plasmids have more than one origin
-    # combined_df = pd.DataFrame("SEQUENCE", "PRODUCT")
-    for plasmid in PLASMIDS:
-        df = pd.read_csv(f"{FILE_PATH}/{plasmid}.ORIs.tsv", sep="\t")
-        df = df[["SEQUENCE", "PRODUCT"]]
-        if (len(df) > 1):
-            counter+=1
-            with open(OUTPUT_PATH, "a") as f:
-                print(plasmid,file=f)
-                print(df, file=f)
-            # combined_df = pd.concat([df, combined_df])
-    # combined_df.to_csv(OUTPUT_PATH, sep="\t", index=False)
+    combined_df = pd.DataFrame(columns=["seqID", "Type", "Intergenic_Start", "Intergenic_End", "Intergenic_Sequence"])
+    for PLASMID in PLASMIDS:
+        ORI_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.csv"
+        if os.path.getsize(ORI_PATH) != 0:
+            df = pd.read_csv(ORI_PATH, sep="\t")
+            df = df[["seqID", "Type", "Intergenic_Start", "Intergenic_End", "Intergenic_Sequence"]]
+            if (len(df) > 1):
+                counter+=1
+                combined_df = pd.concat([df, combined_df])
+                with open(OUTPUT_PATH, "a") as f:
+                    print(PLASMID,file=f)
+                    print(df, file=f)
+    combined_df.to_csv(COMBINED_PATH, sep="\t", index=False)
     with open(OUTPUT_PATH, "a") as f:
         print(counter, file=f)
+
 
 def cleanup_orivfinder(PLASMID):
     OUTPUT_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.csv"
@@ -69,7 +73,17 @@ def cleanup_orivfinder_multiple(FILE):
         # columns to append
         igs_df.to_csv(OUTPUT_PATH, sep="\t", index=False)
 
-
+# convert ORI df to fasta file for clustering with mmseqs2
+def mmseqs(INPUT_FILE):
+    df = pd.read_csv(INPUT_FILE, sep="\t")
+    OUTPUT_FILE = "multiple.ORIs.fasta"
+    count = 0
+    with open(OUTPUT_FILE, "w") as f:
+        for _, row in df.iterrows():
+            header = f">{row['seqID']}_{count}"
+            seq = row["Intergenic_Sequence"]
+            f.write(f"{header}\n{seq}\n")
+            count+=1
 
             
 if __name__ == "__main__":
