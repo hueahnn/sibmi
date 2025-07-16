@@ -338,7 +338,8 @@ Progress:
   - fix heterodimer-finder.py
 
 
-
+# Jul 15, 2025:
+- fixed and ran heterodimer-finder.py --> out of 999 seqs, 224 have desired feature
 
 
 

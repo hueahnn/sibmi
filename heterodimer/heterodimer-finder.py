@@ -1,6 +1,6 @@
 # author: hueahnn
 # begin: 06/24/25
-# updated: 07/01/25
+# updated: 07/15/25
 # purpose: for filtering for the heterodimers of interest 
 import pandas as pd
 import os
@@ -28,8 +28,11 @@ def single(path, plasmid):
 
 # counting the number of class changes for each insertion sequence within a plasmid
 def count(ins_seq_df, ori_df, output_file):
+    open(output_file, "w").close()
     # filter out seqs with 1 IS and combine info into one df
-    ins_seq_df = ins_seq_df[ins_seq_df.ncopy4is != 1]
+    # print(ins_seq_df)
+    # print(ori_df)
+    ins_seq_df = ins_seq_df[ins_seq_df.copies > 1]
 
     # rename cols to match and combine the dfs into one df
     ori_simple = ori_df[["seqID", "begin", "end", "type", "feature"]]
@@ -37,6 +40,7 @@ def count(ins_seq_df, ori_df, output_file):
     df = pd.concat([is_simple, ori_simple])
 
     # determine sequential order of features + number of class changes + output seqID
+    total = 0
     for id in df["seqID"].unique():
         plasmid_df = df[df.seqID == id]
         plasmid_df = plasmid_df.sort_values("begin")
@@ -54,9 +58,12 @@ def count(ins_seq_df, ori_df, output_file):
                 if (curr != next) :
                     changes += 1
             if (changes > 2):
+                total+=1
                 with open(output_file, "a") as f:
                     print(f"{id}\t{feat}\t{changes}", file=f)
                     print(is_df, file=f)
+    with open(output_file, "a") as f:
+        print(total,file=f)
 
 
 ### below is an implementation for running the script on one giant aggregated file containing the info for multiple plasmids instead of a single plasmid ###
@@ -74,7 +81,35 @@ def aggregated():
     output_file = "test-batch-1/heterodimer-outputs.txt"
     count(ins_seq_df, ori_df, output_file)
 
-    
+
+### for input txt file containing ids of every seq
+def aggregated(FILE):
+    PLASMIDS = []
+    with open(FILE, "r") as f:
+        PLASMIDS = [line.strip() for line in f if line.strip()]
+    ins_seq_df = pd.DataFrame(columns=['qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore', 'group', 'copies'])
+    ori_df = pd.DataFrame(columns=['Accession_Number', 'Evidence', 'Type', 'Intergenic_Start', 'Intergenic_End', 'Intergenic_Sequence', 'Iteron_Entropy_Score', 'Iteron_df', 'Pattern_Score', 'Pattern_Df', 'AT_Score', 'AT_Df', 'RNA_df', 'Total_Score', 'Sum_Score', 'gene', 'gene_id', 'gene_start', 'gene_end', 'mmseqs_hit', 'seqID'])
+    for PLASMID in PLASMIDS:
+        IS_PATH = f"heterodimer/final/{PLASMID}.blast.tsv"
+        ORI_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.csv"
+        if (os.path.getsize(IS_PATH) != 0) and (os.path.getsize(ORI_PATH) != 0):
+            ins_seq_df = pd.concat([ins_seq_df,pd.read_csv(IS_PATH, sep='\t')], ignore_index=True)
+            ori_df = pd.concat([ori_df,pd.read_csv(ORI_PATH, sep='\t')], ignore_index=True)
+    # put together ins seq data
+    ins_seq_df = ins_seq_df.rename(columns={"qseqid":"seqID","qstart":"begin", "qend":"end", "group":"feature"})
+    ins_seq_df["type"] = "is"
+    # do some filtering for eval, length, percent identity, and such?
+    # put together ORI data
+    ori_df = ori_df.rename(columns={"Intergenic_Start":"begin", "Intergenic_End":"end", "Accession_Number":"feature"})
+    ori_df["type"] = "ori"
+    # specify output file directory
+    output_file = "heterodimer-outputs-1000.txt"
+    count(ins_seq_df, ori_df, output_file)
+
+
+
+
+
 
 if __name__ == "__main__":
     args = sys.argv

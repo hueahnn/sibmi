@@ -30,26 +30,22 @@ def main(PLASMID_PATH, FILE_PATH):
         print(counter, file=f)
 
 def cleanup_orivfinder(PLASMID):
+    OUTPUT_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.csv"
+    open(OUTPUT_PATH, "w").close()
     PATH = f"heterodimer/ORIs/{PLASMID}/"
-    igs_df = pd.read_csv(f"{PATH}/All_IGSs.csv")
-    rip_df = pd.read_csv(f"{PATH}/RIP.csv")
+    if (os.path.getsize(f"{PATH}/All_IGSs.csv") == 0):
+        return
+    igs_df = pd.read_csv(f"{PATH}/All_IGSs.csv", sep="\t")
+    igs_df["seqID"] = PLASMID
+    rip_df = pd.read_csv(f"{PATH}/RIP.csv", sep="\t")
     # clean up and stitch together igs_df
+    if igs_df.empty:
+        return
     igs_df = igs_df[igs_df.Type < 3]
-    # columns to append
-    gene, gene_id, gene_start, gene_end, mmseqs_hit = [None] * len(igs_df)
-    for i in range(0,len(igs_df)):
-        if igs_df.Evidence.iat[i] == "nearby RIP": 
-            for j in range(0,len(rip_df)):
-                if igs_df.Intergenic_End.iat[i] == rip_df.gene_start.iat[j]:
-                    gene[i] = rip_df.gene.iat[j]
-                    gene_id[i] = rip_df.gene_id[j]
-                    gene_start[i] = rip_df.gene_start[j]
-                    gene_end[i] = rip_df.gene_end[j]
-                    mmseqs_hit[i] = rip_df.mmseqs_hit[j]
-    append_rip_info = pd.DataFrame({"gene":gene, "gene_id":gene_id, "gene_start":gene_start, "gene_end":gene_end, "mmseqs_hit":mmseqs_hit})
-    igs_df = pd.concat([igs_df,append_rip_info], axis=1)
-    igs_df.to_csv(f"{PATH}/All_IGSs.csv", sep="\t")
-    # stitch info to rip_df
+    if "Unnamed: 0" in igs_df.columns:
+        igs_df = igs_df.drop(columns=["Unnamed: 0"])
+    igs_df.to_csv(OUTPUT_PATH, sep="\t",index=False)
+
 
 def cleanup_orivfinder_multiple(FILE):
     PLASMIDS = []
@@ -61,27 +57,17 @@ def cleanup_orivfinder_multiple(FILE):
         PATH = f"heterodimer/ORIs/{PLASMID}/"
         if (os.path.getsize(f"{PATH}/All_IGSs.csv") == 0):
             continue
-        igs_df = pd.read_csv(f"{PATH}/All_IGSs.csv")
-        rip_df = pd.read_csv(f"{PATH}/RIP.csv")
+        igs_df = pd.read_csv(f"{PATH}/All_IGSs.csv", sep="\t")
+        igs_df["seqID"] = PLASMID
+        rip_df = pd.read_csv(f"{PATH}/RIP.csv", sep="\t")
         # clean up and stitch together igs_df
+        if igs_df.empty:
+            continue
         igs_df = igs_df[igs_df.Type < 3]
+        if "Unnamed: 0" in igs_df.columns:
+            igs_df = igs_df.drop(columns=["Unnamed: 0"])
         # columns to append
-        empty = [None] * len(igs_df)
-        gene, gene_id, gene_start, gene_end, mmseqs_hit = empty, empty, empty, empty, empty
-        for i in range(0,len(igs_df)):
-            if igs_df.Evidence.iat[i] == "nearby RIP": 
-                for j in range(0,len(rip_df)):
-                    if igs_df.Intergenic_End.iat[i] == rip_df.gene_start.iat[j]:
-                        gene[i] = rip_df.gene.iat[j]
-                        gene_id[i] = rip_df.gene_id[j]
-                        gene_start[i] = rip_df.gene_start[j]
-                        gene_end[i] = rip_df.gene_end[j]
-                        mmseqs_hit[i] = rip_df.mmseqs_hit[j]
-        append_rip_info = pd.DataFrame({"gene":gene, "gene_id":gene_id, "gene_start":gene_start, "gene_end":gene_end, "mmseqs_hit":mmseqs_hit})
-        igs_df = pd.concat([igs_df,append_rip_info], axis=1)
-        igs_df.to_csv(OUTPUT_PATH, sep="\t")
-        # stitch info to rip_df
-
+        igs_df.to_csv(OUTPUT_PATH, sep="\t", index=False)
 
 
 
