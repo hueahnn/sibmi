@@ -31,7 +31,6 @@ def main(TXT_FILE):
             empty_BLASTs += 1
             with open(BLAST_FILE, "a") as f:
                 print(plasmid, file=f)
-        # finish for ORIs
         ori_df = pd.read_csv(ORI_PATH, sep="\t")
         if ori_df.empty:
             empty_ORIs += 1

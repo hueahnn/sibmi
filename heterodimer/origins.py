@@ -1,6 +1,6 @@
 # author: hueahnn
 # begin: 07/02/2025
-# updated: 07/16/25
+# updated: 07/17/25
 # purpose: determine how many plasmids have multiple origins and the co-occurence of origins
 
 import pandas as pd
@@ -74,9 +74,8 @@ def cleanup_orivfinder_multiple(FILE):
         igs_df.to_csv(OUTPUT_PATH, sep="\t", index=False)
 
 # convert ORI df to fasta file for clustering with mmseqs2
-def mmseqs(INPUT_FILE):
+def mmseqs(INPUT_FILE, OUTPUT_FILE):
     df = pd.read_csv(INPUT_FILE, sep="\t")
-    OUTPUT_FILE = "multiple.ORIs.fasta"
     count = 0
     with open(OUTPUT_FILE, "w") as f:
         for _, row in df.iterrows():

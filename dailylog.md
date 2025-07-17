@@ -369,8 +369,14 @@ To do:
   - `mmseqs cluster DB DB_clu tmp --min-seq-id num`
   - `mmseqs createtsv DB DB DB_clu DB_clu.tsv`
   - to determine number of unique clusters: `import pandas as pd` `column_names = ['cluster', 'origin']` `df = pd.read_csv("___.tsv", sep="\t", names=column_names)` `df['cluster'].nunique()`
-
-
+- BLAST ORIs against OriVFinder DB, assign top hit to each seq
+- Make some charts with length, presence/absence of MOB & AMR genes
+Future steps:
+- Generate a chart of coocurrence frequencies and generate a circle plot of association
+- Calculate the frequency of heterodimerization events
+- Plot lengths vs abundance
+- Create bar graphs comparing AMR, MOB, # of IS/per kb for 2+ ORIs vs TOTOs
+- Future project --> look for heterodimers via kmers, can use kmer density to determine dimers formed by insertion seqs
 
 
 
