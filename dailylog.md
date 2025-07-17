@@ -340,7 +340,7 @@ Progress:
 
 # Jul 15, 2025:
 - fixed and ran heterodimer-finder.py --> out of 999 seqs, 224 have desired feature
-- `O2_jobs_report` to view memory usage and such
+- `O2_jobs_report --report` to view memory usage and such
 
 
 # Jul 16, 2025:
@@ -356,6 +356,19 @@ Downstream analysis directions:
 - How many of these are events in which AMR genes (AMRfinder) or mobilizable genes (MOBfinder) are present?
 To do:
 - clustering with mmseqs2 --> not sure how to interpret the output
+  - first col is cluster (representative seq) and second col is all seqs
+  - prioritize type 1 hits only and cluster by 30% identity
+  - to determine the actual identity will prob need to BLAST against OriVFinder DB
+
+
+# Jul 17, 2025:
+- 545 ORIs of type 1
+- Commands to run mmseqs2:
+  - first convert FASTA DB to MMseqs2 DB: `mmseqs createdb examples/DB.fasta DB`
+  - `mmseqs cluster DB DB_clu tmp --min-seq-id num`
+  - `mmseqs createtsv DB DB DB_clu DB_clu.tsv`
+
+
 
 
 
