@@ -379,6 +379,28 @@ Future steps:
 - Future project --> look for heterodimers via kmers, can use kmer density to determine dimers formed by insertion seqs
 
 
+# Jul 18, 2025:
+Tasklist: 
+- Create a script to BLAST ORIs --> done, 134 ORIs identified using BLAST
+- Append AMR info to df
+- Figures to generate:
+  - Length distribution
+  - Circle plot of association for ORIs
+
+
+# Jul 19, 2025:
+- ORI stats:
+  - 136 plasmids have a type 1 ORI, 431 with type 1 or 2 ORI
+- Create a script to find the cooccurrence frequency of identified ORIs and how often each one occurs
+
+
+# Jul 21, 2025:
+- Generating a length distribution plot for 1000 plasmids, multiple ORIs vs TOTOs, includes type 1 and 2 ORIs
+- empty ORIs: 997, empty BLASTs: 33374
+- Running AMRfinder on entire DB (75000), running heterodimer-finder.py on entire DB
+  - Need to figure out a way to append this data into a final df that has all the relevant info necessary
+
+
 
 
 

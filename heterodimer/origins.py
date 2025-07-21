@@ -73,6 +73,7 @@ def cleanup_orivfinder_multiple(FILE):
         # columns to append
         igs_df.to_csv(OUTPUT_PATH, sep="\t", index=False)
 
+
 # convert ORI df to fasta file for clustering with mmseqs2
 def mmseqs(INPUT_FILE, OUTPUT_FILE):
     df = pd.read_csv(INPUT_FILE, sep="\t")
@@ -84,7 +85,31 @@ def mmseqs(INPUT_FILE, OUTPUT_FILE):
             f.write(f"{header}\n{seq}\n")
             count+=1
 
-            
+
+# assign highest BLAST hit
+def identity(FILE):
+    OUTPUT_FILE = "type.one.ORIs.identified.tsv"
+    df = pd.read_csv(FILE, sep="\t")
+    df = df.loc[df.groupby("qseqid")["bitscore"].idxmax()]
+    df.to_csv(OUTPUT_FILE, sep="\t")
+
+
+# create empty file if missing
+def missing(FILE):
+    PLASMIDS = []
+    with open(FILE, 'r') as f:
+        PLASMIDS = [line.strip() for line in f if line.strip()]
+    for plasmid in PLASMIDS:
+        ORI_PATH = f"heterodimer/final/{plasmid}/All_IGSs.csv"
+        dir_path = os.path.dirname(ORI_PATH)
+        os.makedirs(dir_path, exist_ok=True)
+        open(ORI_PATH, 'a').close()
+
+
+
+
+
+
 if __name__ == "__main__":
     args = sys.argv
     # args[0] = current file

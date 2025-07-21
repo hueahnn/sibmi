@@ -1,6 +1,6 @@
 # author: hueahnn
 # begin: 06/24/25
-# updated: 07/16/25
+# updated: 07/21/25
 # purpose: for filtering for the heterodimers of interest 
 import pandas as pd
 import os
@@ -29,6 +29,7 @@ def single(path, plasmid):
 # counting the number of class changes for each insertion sequence within a plasmid
 def count(ins_seq_df, ori_df, output_file):
     open(output_file, "w").close()
+    output_df = pd.DataFrame(columns=["seqID", "begin", "end", "type", "feature"])
     # filter out seqs with 1 IS and combine info into one df
     ins_seq_df = ins_seq_df[ins_seq_df.copies > 1]
 
@@ -65,8 +66,10 @@ def count(ins_seq_df, ori_df, output_file):
                 with open(output_file, "a") as f:
                     print(f"{id}\t{feat}\t{changes}", file=f)
                     print(is_df, file=f)
+                output_df = pd.concat([output_df,is_df], ignore_index=True)
     with open(output_file, "a") as f:
         print(f"plasmid hits: {plasmids}\ntotal hits: {total}",file=f)
+    output_df.to_csv("TOTO_df_1000.csv",sep="\t")
 
 
 ### below is an implementation for running the script on one giant aggregated file containing the info for multiple plasmids instead of a single plasmid ###
@@ -86,7 +89,7 @@ def aggregated():
 
 
 ### for input txt file containing ids of every seq
-def aggregated(FILE):
+def aggregated(FILE, OUTPUT_FILE):
     PLASMIDS = []
     with open(FILE, "r") as f:
         PLASMIDS = [line.strip() for line in f if line.strip()]
@@ -109,9 +112,7 @@ def aggregated(FILE):
     ori_df["type"] = "ori"
     ORI_OUTPUT = "ORI.summary.tsv"
     ori_df.to_csv(ORI_OUTPUT, sep="\t", index=False)
-    # specify output file directory
-    output_file = "heterodimer-outputs-1000.txt"
-    count(ins_seq_df, ori_df, output_file)
+    count(ins_seq_df, ori_df, OUTPUT_FILE)
 
 
 

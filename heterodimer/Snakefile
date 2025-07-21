@@ -19,7 +19,7 @@ rule all:
         # expand(main_dir("{plasmid}/fasta/{plasmid}.fasta.tsv"), path = PATH, plasmid = PLASMIDS), # rule isescan
         expand(main_dir("{plasmid}.blast.tsv"), plasmid = PLASMIDS), # rule blast_ins_seqs
         expand(main_dir("{plasmid}.pairwise.blast.tsv"), plasmid = PLASMIDS), # rule blast_processing
-        # expand(main_dir("ORIs/{plasmid}/All_IGSs.csv"), plasmid = PLASMIDS), # rule orivfinder
+        expand(main_dir("ORIs/{plasmid}/All_IGSs.csv"), plasmid = PLASMIDS), # rule orivfinder
         # expand(main_dir("ORIs/{plasmid}/Annotation_table_for_{plasmid}.csv"), plasmid = PLASMIDS), # rule plasann
         # expand("{path}/{plasmid}-heterodimer-outputs.txt", path = PATH, plasmid = PLASMIDS) # rule class_changes
 

@@ -26,14 +26,19 @@ def main(TXT_FILE):
     empty_ORIs = 0
     for plasmid in PLASMIDS:
         ORI_PATH = f"heterodimer/ORIs/{plasmid}/All_IGSs.csv"
+        open(ORI_PATH, "a").close()
         BLAST_PATH = f"heterodimer/{plasmid}.pairwise.blast.tsv"
+        open(BLAST_PATH, "a").close()
         if (os.path.getsize(BLAST_PATH) == 0):
             empty_BLASTs += 1
             with open(BLAST_FILE, "a") as f:
                 print(plasmid, file=f)
-        ori_df = pd.read_csv(ORI_PATH, sep="\t")
-        if ori_df.empty:
+        if (os.path.getsize(ORI_PATH) == 0):
             empty_ORIs += 1
+        else: 
+            ori_df = pd.read_csv(ORI_PATH, sep="\t")
+            if ori_df.empty:
+                empty_ORIs += 1
     print(f"empty ORIs: {empty_ORIs}\nempty BLASTs: {empty_BLASTs}")
     with open(BLAST_FILE, "r") as f:
         PLASMIDS = [line.strip() for line in f if line.strip()]
