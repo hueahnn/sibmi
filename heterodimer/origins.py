@@ -1,11 +1,12 @@
 # author: hueahnn
 # begin: 07/02/2025
-# updated: 07/17/25
+# updated: 07/22/25
 # purpose: determine how many plasmids have multiple origins and the co-occurence of origins
 
 import pandas as pd
 import os
 import sys
+import csv
 
 def main(PLASMID_PATH):
     OUTPUT_PATH = f"ORIs.summary.tsv"
@@ -33,22 +34,41 @@ def main(PLASMID_PATH):
         print(counter, file=f)
 
 
+# reading in a mix of tsvs and csvs
+def read_auto_delim_csv(filepath):
+    import csv
+    with open(filepath, 'r', newline='') as f:
+        sample = f.read(2048)
+        f.seek(0)
+        try:
+            dialect = csv.Sniffer().sniff(sample, delimiters=[',', '\t', ';'])
+            delimiter = dialect.delimiter
+        except csv.Error:
+            delimiter = ','  # fallback
+    # use python engine and warn if rows are skipped
+    try:
+        df = pd.read_csv(filepath, delimiter=delimiter, engine='python', on_bad_lines='warn')
+    except Exception as e:
+        print(f"Failed to read {filepath}: {e}")
+        return pd.DataFrame()
+    return df
+
 def cleanup_orivfinder(PLASMID):
     OUTPUT_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.csv"
     open(OUTPUT_PATH, "w").close()
     PATH = f"heterodimer/ORIs/{PLASMID}/"
+    input_file = os.path.join(PATH, "All_IGSs.csv")
     if (os.path.getsize(f"{PATH}/All_IGSs.csv") == 0):
         return
-    igs_df = pd.read_csv(f"{PATH}/All_IGSs.csv", sep="\t")
-    igs_df["seqID"] = PLASMID
-    rip_df = pd.read_csv(f"{PATH}/RIP.csv", sep="\t")
-    # clean up and stitch together igs_df
-    if igs_df.empty:
+    igs_df = read_auto_delim_csv(input_file)
+    if igs_df.empty or "Type" not in igs_df.columns:
         return
-    igs_df = igs_df[igs_df.Type < 3]
+    # clean up and stitch together igs_df
+    igs_df["seqID"] = PLASMID
+    igs_df = igs_df[igs_df.Type==1]
     if "Unnamed: 0" in igs_df.columns:
         igs_df = igs_df.drop(columns=["Unnamed: 0"])
-    igs_df.to_csv(OUTPUT_PATH, sep="\t",index=False)
+    igs_df.to_csv(OUTPUT_PATH, sep="\t", index=False)
 
 
 def cleanup_orivfinder_multiple(FILE):
@@ -59,18 +79,17 @@ def cleanup_orivfinder_multiple(FILE):
         OUTPUT_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.csv"
         open(OUTPUT_PATH, "w").close()
         PATH = f"heterodimer/ORIs/{PLASMID}/"
+        input_file = os.path.join(PATH, "All_IGSs.csv")
         if (os.path.getsize(f"{PATH}/All_IGSs.csv") == 0):
             continue
-        igs_df = pd.read_csv(f"{PATH}/All_IGSs.csv", sep="\t")
-        igs_df["seqID"] = PLASMID
-        # rip_df = pd.read_csv(f"{PATH}/RIP.csv", sep="\t")
-        # clean up and stitch together igs_df
+        igs_df = read_auto_delim_csv(input_file)
         if igs_df.empty or "Type" not in igs_df.columns:
             continue
-        igs_df = igs_df[igs_df.Type < 3]
+        # clean up and stitch together igs_df
+        igs_df["seqID"] = PLASMID
+        igs_df = igs_df[igs_df.Type==1]
         if "Unnamed: 0" in igs_df.columns:
             igs_df = igs_df.drop(columns=["Unnamed: 0"])
-        # columns to append
         igs_df.to_csv(OUTPUT_PATH, sep="\t", index=False)
 
 

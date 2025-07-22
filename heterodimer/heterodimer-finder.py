@@ -1,6 +1,6 @@
 # author: hueahnn
 # begin: 06/24/25
-# updated: 07/21/25
+# updated: 07/22/25
 # purpose: for filtering for the heterodimers of interest 
 import pandas as pd
 import os
@@ -27,9 +27,11 @@ def single(path, plasmid):
                 print(plasmid, file=f)
 
 # counting the number of class changes for each insertion sequence within a plasmid
-def count(ins_seq_df, ori_df, output_file):
+def count(ins_seq_df, ori_df, output):
+    output_file = f"heterodimer-outputs-{output}.txt"
     open(output_file, "w").close()
     output_df = pd.DataFrame(columns=["seqID", "begin", "end", "type", "feature"])
+    output_plasmids = f"heterodimer-plasmids-{output}.txt"
     # filter out seqs with 1 IS and combine info into one df
     ins_seq_df = ins_seq_df[ins_seq_df.copies > 1]
 
@@ -62,6 +64,8 @@ def count(ins_seq_df, ori_df, output_file):
                 total+=1
                 if first==0:
                     plasmids+=1
+                    with open(output_plasmids, "a") as f:
+                        print(id, file=f)
                 first+=1
                 with open(output_file, "a") as f:
                     print(f"{id}\t{feat}\t{changes}", file=f)
@@ -69,7 +73,7 @@ def count(ins_seq_df, ori_df, output_file):
                 output_df = pd.concat([output_df,is_df], ignore_index=True)
     with open(output_file, "a") as f:
         print(f"plasmid hits: {plasmids}\ntotal hits: {total}",file=f)
-    output_df.to_csv("TOTO_df_1000.csv",sep="\t")
+    output_df.to_csv(f"TOTO_df_{output}.csv",sep="\t")
 
 
 ### below is an implementation for running the script on one giant aggregated file containing the info for multiple plasmids instead of a single plasmid ###
@@ -89,7 +93,7 @@ def aggregated():
 
 
 ### for input txt file containing ids of every seq
-def aggregated(FILE, OUTPUT_FILE):
+def aggregated(FILE, OUTPUT_NUM):
     PLASMIDS = []
     with open(FILE, "r") as f:
         PLASMIDS = [line.strip() for line in f if line.strip()]
@@ -112,9 +116,23 @@ def aggregated(FILE, OUTPUT_FILE):
     ori_df["type"] = "ori"
     ORI_OUTPUT = "ORI.summary.tsv"
     ori_df.to_csv(ORI_OUTPUT, sep="\t", index=False)
-    count(ins_seq_df, ori_df, OUTPUT_FILE)
+    count(ins_seq_df, ori_df, OUTPUT_NUM)
 
 
+def singularize(OUTPUT_FILE):
+    df = pd.read_csv("../filtered.ALL.plasmid_list.download.tsv", sep="\t")
+    # assign single values for id and db for original plasmidscope db tsv file
+    for i in range(0,len(df)):
+        df.at[i, "Plasmid_ID"] = df.Plasmid_ID.iat[i].split(",")[0]
+        df.at[i, "Data_Source"] = df.Data_Source.iat[i].split(",")[0]
+    df.to_csv(OUTPUT_FILE, sep="\t", index=False)
+
+def final_df(OUTPUT_FILE):
+    # cleaning up and aggregating a singular final dataframe with all necessary information
+    df = pd.read_csv("../final_df.tsv", sep="\t")
+    # add info abt ins seqs and ORIs
+    # add info abt AMR
+    
 
 
 

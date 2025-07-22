@@ -403,6 +403,21 @@ Tasklist:
 - Q: How do we know these are heterodimers and not homodimers (same ORI sandwiched between IS)
 
 
+# Jul 22, 2025:
+- Figure out why heterodimer-finder.py isn't working for full DB
+  - Seems final ORI files are empty after parsing orivfinder outputs --> rerunning origins.py
+    - Problem was that some of the orivfinder outputs are tsvs and some are csvs, also for the tsvs some columns had commas which was messing up the line reading... a whole mess so some files have been skipped
+- Generate plots
+  - Generated a length distribution plot, realized sub dfs are lackluster because original tsv file has multiple ids for the same plasmid which is screwing up the format of the data --> fixed this, new tsv called `final_df.tsv`, append data to this
+- Append data and make a final df with all info
+- Reran for empty files: empty ORIs: 12383, empty BLASTs: 33374
+
+To Do:
+- Append AMR info to final dataframe
+- I think I deleted the final/ORI files on accident (judging from the ORI empty df concat error when running heterodimer-finder.py)-- run origins.py then how_many.py then heterodimer-finder.py again...
+  - Also possibly next time sbatch heterodimer-finder.py because it takes a while to run lol
+  - NVM IT RAN!!!! plasmid hits: 9817, total hits: 21674
+
 
 
 
