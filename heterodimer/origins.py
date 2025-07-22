@@ -63,9 +63,9 @@ def cleanup_orivfinder_multiple(FILE):
             continue
         igs_df = pd.read_csv(f"{PATH}/All_IGSs.csv", sep="\t")
         igs_df["seqID"] = PLASMID
-        rip_df = pd.read_csv(f"{PATH}/RIP.csv", sep="\t")
+        # rip_df = pd.read_csv(f"{PATH}/RIP.csv", sep="\t")
         # clean up and stitch together igs_df
-        if igs_df.empty:
+        if igs_df.empty or "Type" not in igs_df.columns:
             continue
         igs_df = igs_df[igs_df.Type < 3]
         if "Unnamed: 0" in igs_df.columns:
@@ -100,7 +100,7 @@ def missing(FILE):
     with open(FILE, 'r') as f:
         PLASMIDS = [line.strip() for line in f if line.strip()]
     for plasmid in PLASMIDS:
-        ORI_PATH = f"heterodimer/final/{plasmid}/All_IGSs.csv"
+        ORI_PATH = f"heterodimer/final/{plasmid}.All_IGSs.csv"
         dir_path = os.path.dirname(ORI_PATH)
         os.makedirs(dir_path, exist_ok=True)
         open(ORI_PATH, 'a').close()

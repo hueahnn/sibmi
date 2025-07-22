@@ -7,17 +7,17 @@ import pandas as pd
 import sys
 import os
 
+
+
 def main(TXT_FILE):
     PLASMIDS = []
     with open(TXT_FILE, "r") as f:
         PLASMIDS = [line.strip() for line in f if line.strip()]
-    # testing...
-    df = pd.read_csv("../ALL.plasmid_list.download.tsv", sep="\t")
+    df = pd.read_csv("../filtered.ALL.plasmid_list.download.tsv", sep="\t")
     df = df[df.Plasmid_ID.isin(PLASMIDS)]
     df.to_csv("test.csv", sep="\t")
-    missing = df.Plasmid_ID.isin(PLASMIDS)
+    missing = ~df.Plasmid_ID.isin(PLASMIDS)
     missing.to_csv("missing.csv", sep="\t")
-    #
     BLAST_FILE = "empty_BLASTs.txt"
     open(BLAST_FILE, "w").close()
     empty_BLASTs = 0
@@ -35,16 +35,21 @@ def main(TXT_FILE):
                 print(plasmid, file=f)
         if (os.path.getsize(ORI_PATH) == 0):
             empty_ORIs += 1
-        else: 
+            with open(ORI_FILE, "a") as f:
+                print(plasmid, file=f)
+        else:
             ori_df = pd.read_csv(ORI_PATH, sep="\t")
             if ori_df.empty:
                 empty_ORIs += 1
+                with open(ORI_FILE, "a") as f:
+                    print(plasmid, file=f)
+            elif ori_df.iloc[0,0] == plasmid:
+                empty_ORIs += 1
+                with open(ORI_FILE, "a") as f:
+                    print(plasmid, file=f)
+                open(ORI_PATH, "w").close()
     print(f"empty ORIs: {empty_ORIs}\nempty BLASTs: {empty_BLASTs}")
-    with open(BLAST_FILE, "r") as f:
-        PLASMIDS = [line.strip() for line in f if line.strip()]
-    df = pd.read_csv("../filtered.ALL.plasmid_list.download.tsv", sep="\t")
-    df = df[df.Plasmid_ID.isin(PLASMIDS)]
-    df.to_csv("empty_BLASTs.csv", sep="\t")
+
 
 
 if __name__ == "__main__":

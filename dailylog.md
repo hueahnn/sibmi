@@ -399,6 +399,8 @@ Tasklist:
 - empty ORIs: 997, empty BLASTs: 33374
 - Running AMRfinder on entire DB (75000), running heterodimer-finder.py on entire DB
   - Need to figure out a way to append this data into a final df that has all the relevant info necessary
+- Launch a jupyter session from vscode: `sbatch vscode.sh` `tail -f slurm-7885318.out`
+- Q: How do we know these are heterodimers and not homodimers (same ORI sandwiched between IS)
 
 
 
