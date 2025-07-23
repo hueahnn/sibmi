@@ -1,6 +1,6 @@
 # author: hueahnn
 # begin: 07/02/2025
-# updated: 07/22/25
+# updated: 07/23/25
 # purpose: determine how many plasmids have multiple origins and the co-occurence of origins
 
 import pandas as pd
@@ -8,9 +8,9 @@ import os
 import sys
 import csv
 
-def main(PLASMID_PATH):
-    OUTPUT_PATH = f"ORIs.summary.tsv"
-    COMBINED_PATH = f"ORIs.df.tsv"
+def multiple(PLASMID_PATH):
+    OUTPUT_PATH = f"mORIs.summary.tsv"
+    COMBINED_PATH = f"mORIs.df.tsv"
     PLASMIDS = []
     with open(PLASMID_PATH, "r") as f:
         PLASMIDS = [line.strip() for line in f if line.strip()]
@@ -124,7 +124,15 @@ def missing(FILE):
         os.makedirs(dir_path, exist_ok=True)
         open(ORI_PATH, 'a').close()
 
-
+def num_origins(FILE):
+    ORI_df = pd.read_csv("ORI.summary.tsv", sep="\t", index_col=False)
+    main_df = pd.read_csv(FILE, sep="\t")
+    main_df["num_ORIs"] = 0
+    for id in ORI_df["seqID"].unique():
+        sub_df = ORI_df[ORI_df["seqID"]==id]
+        ORIs = len(sub_df)
+        main_df.loc[main_df["Plasmid_ID"]==id, "num_ORIs"] = ORIs
+    main_df.to_csv(FILE, sep="\t", index=False)
 
 
 

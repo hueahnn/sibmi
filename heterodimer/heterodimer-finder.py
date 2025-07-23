@@ -1,6 +1,6 @@
 # author: hueahnn
 # begin: 06/24/25
-# updated: 07/22/25
+# updated: 07/23/25
 # purpose: for filtering for the heterodimers of interest 
 import pandas as pd
 import os
@@ -127,11 +127,35 @@ def singularize(OUTPUT_FILE):
         df.at[i, "Data_Source"] = df.Data_Source.iat[i].split(",")[0]
     df.to_csv(OUTPUT_FILE, sep="\t", index=False)
 
-def final_df(OUTPUT_FILE):
-    # cleaning up and aggregating a singular final dataframe with all necessary information
-    df = pd.read_csv("../final_df.tsv", sep="\t")
-    # add info abt ins seqs and ORIs
-    # add info abt AMR
+def final_df():
+    # create a final df with all necessary info
+    df = pd.read_csv("../final_df.tsv", sep="\t", index_col=False)
+    df["AMR_binary"] = 0
+    AMR_df = pd.DataFrame(columns=['Protein id', 'Contig id', 'Start', 'Stop', 'Strand', 'Element symbol', 'Element name', 'Scope', 'Type', 'Subtype', 'Class', 'Subclass', 'Method', 'Target length', 'Reference sequence length', '% Coverage of reference', '% Identity to reference', 'Alignment length', 'Closest reference accession', 'Closest reference name', 'HMM accession', 'HMM description'])
+    PLASMIDS = df["Plasmid_ID"]
+
+    # append AMRs
+    for plasmid in PLASMIDS:
+        path = f"../analysis/outputs/AMRs/{plasmid}.AMRs.tsv"
+        if os.path.exists(path):
+            amr = pd.read_csv(path, sep="\t")
+            if not amr.empty:
+                df.loc[df["Plasmid_ID"]==plasmid, "AMR_binary"] = 1
+                AMR_df = pd.concat([AMR_df,amr], ignore_index=True)
+    AMR_df.to_csv("../AMRs_df.tsv", sep="\t")
+        
+    df.to_csv("../final_df_AMRs.tsv", sep="\t", index=False)
+
+def num_ins_seqs(FILE):
+    is_df = pd.read_csv("IS.summary.tsv", sep="\t", index_col=False)
+    main_df = pd.read_csv(FILE, sep="\t")
+    main_df["num_IS"] = 0
+    for id in is_df["seqID"].unique():
+        sub_df = is_df[is_df["seqID"]==id]
+        insseq = len(sub_df)
+        main_df.loc[main_df["Plasmid_ID"]==id, "num_IS"] = insseq
+    main_df.to_csv(FILE, sep="\t", index=False)
+
     
 
 

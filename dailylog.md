@@ -417,6 +417,23 @@ To Do:
 - I think I deleted the final/ORI files on accident (judging from the ORI empty df concat error when running heterodimer-finder.py)-- run origins.py then how_many.py then heterodimer-finder.py again...
   - Also possibly next time sbatch heterodimer-finder.py because it takes a while to run lol
   - NVM IT RAN!!!! plasmid hits: 9817, total hits: 21674
+  - mORIs: 18350 distinct plasmids (type 1 ORIs only)
+
+
+# Jul 23, 2025:
+- ORI stats:
+  - 37963 plasmids with a type 1 ORI, of those-- 18350 with 2+ ORIs and 9817 TOTOs
+- Length stats:
+  - avg all: 92127.55898123325 --> bimodal distribution, find the peak of each peak
+  - avg mORIs: 132316.43543543544
+  - avg TOTOs: 177994.69
+- Some statistical analyses:
+  - for lengths-- randomly sample pairs of 10,000 for which one is longer. This will generate a p-value
+    - pretty high p-val --> not surprising as this is suggestive of TOTOs being a subset of mORIs which is true. also no significant difference (in fact is higher for exclusive which is contrary to intuition) between mORIs inclusive and exclusive of TOTOs
+  - another metric is to bin by the number of ORIs --> this makes sense because intuitively TOTOs should have more ORIs since they can be the fusion of plasmids that originally had several ORIs 
+    - can do the same for # of ins seqs on a plasmid
+  - for AMRs-- randomly sample 10,000 plasmids with replacement, repeat 100 trials, keep track of the fraction with AMRs and plot between different groups
+  - Want to be able to prove that the output results (TOTOs) are a real result and not something due to biases --> so remove all the possible biases
 
 
 
