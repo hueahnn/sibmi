@@ -436,6 +436,13 @@ To Do:
   - Want to be able to prove that the output results (TOTOs) are a real result and not something due to biases --> so remove all the possible biases
 
 
+# Jul 24, 2025:
+- Only have 134 unique type 1 ORIs after using BLAST to identify --> extend to type 2 ORIs as well
+- Cooccurrence table (including type 2 ORIs)
+  - Possibly rerun heterodimer-finder.py inclusive of type 2 ORIs
+- TOOTs (as a direct control) and type 2 ORIs
+- Work on slides
+
 
 
 

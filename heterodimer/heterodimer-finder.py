@@ -146,6 +146,8 @@ def final_df():
         
     df.to_csv("../final_df_AMRs.tsv", sep="\t", index=False)
 
+
+# how many insertion sequences does each plasmid have?
 def num_ins_seqs(FILE):
     is_df = pd.read_csv("IS.summary.tsv", sep="\t", index_col=False)
     main_df = pd.read_csv(FILE, sep="\t")
@@ -156,7 +158,20 @@ def num_ins_seqs(FILE):
         main_df.loc[main_df["Plasmid_ID"]==id, "num_IS"] = insseq
     main_df.to_csv(FILE, sep="\t", index=False)
 
-    
+def num_ins_seqs(FILE, DF):
+    PLASMIDS = []
+    with open(FILE, 'r') as f:
+        PLASMIDS = [line.strip() for line in f if line.strip()]
+    main_df = pd.read_csv(DF, sep="\t")
+    main_df["num_IS"] = 0
+    for plasmid in PLASMIDS:
+        PATH = f"heterodimer/final/{plasmid}.blast.tsv"
+        if os.path.getsize(PATH) == 0:
+            continue
+        sub_df = pd.read_csv(PATH, sep="\t")
+        insseq = len(sub_df)
+        main_df.loc[main_df["Plasmid_ID"]==plasmid, "num_IS"] = insseq
+    main_df.to_csv(DF, sep="\t", index=False)
 
 
 

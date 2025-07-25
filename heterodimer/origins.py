@@ -76,7 +76,7 @@ def cleanup_orivfinder_multiple(FILE):
     with open(FILE, "r") as f:
         PLASMIDS = [line.strip() for line in f if line.strip()]
     for PLASMID in PLASMIDS:
-        OUTPUT_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.csv"
+        OUTPUT_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.2.csv"
         open(OUTPUT_PATH, "w").close()
         PATH = f"heterodimer/ORIs/{PLASMID}/"
         input_file = os.path.join(PATH, "All_IGSs.csv")
@@ -87,7 +87,7 @@ def cleanup_orivfinder_multiple(FILE):
             continue
         # clean up and stitch together igs_df
         igs_df["seqID"] = PLASMID
-        igs_df = igs_df[igs_df.Type==1]
+        igs_df = igs_df[igs_df.Type==2]
         if "Unnamed: 0" in igs_df.columns:
             igs_df = igs_df.drop(columns=["Unnamed: 0"])
         igs_df.to_csv(OUTPUT_PATH, sep="\t", index=False)
@@ -124,6 +124,8 @@ def missing(FILE):
         os.makedirs(dir_path, exist_ok=True)
         open(ORI_PATH, 'a').close()
 
+
+# how many ORIs does each plasmid have?
 def num_origins(FILE):
     ORI_df = pd.read_csv("ORI.summary.tsv", sep="\t", index_col=False)
     main_df = pd.read_csv(FILE, sep="\t")
@@ -134,6 +136,42 @@ def num_origins(FILE):
         main_df.loc[main_df["Plasmid_ID"]==id, "num_ORIs"] = ORIs
     main_df.to_csv(FILE, sep="\t", index=False)
 
+def num_origins(FILE, DF):
+    PLASMIDS = []
+    with open(FILE, 'r') as f:
+        PLASMIDS = [line.strip() for line in f if line.strip()]
+    main_df = pd.read_csv(DF, sep="\t")
+    main_df["num_ORIs"] = 0
+    for plasmid in PLASMIDS:
+        PATH = f"heterodimer/final/{plasmid}.All.IGSs.csv"
+        if os.path.getsize(PATH) == 0:
+            continue
+        sub_df = pd.read_csv(PATH, sep="\t")
+        ORIs = len(sub_df)
+        main_df.loc[main_df["Plasmid_ID"]==plasmid, "num_ORIs"] = ORIs
+    main_df.to_csv(DF, sep="\t", index=False)
+
+def origin_df(FILE):
+    PLASMIDS = []
+    with open(FILE, 'r') as f:
+        PLASMIDS = [line.strip() for line in f if line.strip()]
+    OUTPUT_FILE = "ORIs.1.2.tsv"
+    ori_df = pd.DataFrame(columns=[])
+    for plasmid in PLASMIDS:
+        PATH1 = f"heterodimer/final/{plasmid}.All.IGSs.csv"
+        PATH2 = f"heterodimer/final/{plasmid}.All.IGSs.2.csv"
+        if os.path.getsize(PATH1) == 0:
+            continue
+        if os.path.getsize(PATH2) == 0:
+            continue
+        sub1_df = pd.read_csv(PATH1, sep="\t")
+        sub2_df = pd.read_csv(PATH2, sep="\t")
+        
+
+
+# building a cooccurrence matrix for all ORIs
+def cooccurrence():
+    return
 
 
 
