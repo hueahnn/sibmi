@@ -444,5 +444,26 @@ To Do:
 - Work on slides
 
 
+# Jul 25, 2025:
+- BLAST ORIs once that finishes running
+- Interesting Qs:
+  - Which IS and ORI are seen together
+  - Compare the expected and actual for co-occurence freqs
+
+
+# Jul 26, 2025:
+- BLASTed ORIs for type 1,2,3. Parsed output and assigned highest hits
+- Created script to find the absolute freq of each ORI, script for finding co-occurence matrix in progress
+  - When calling this func, append type 1 and type 2 outputs together
+- Ran heterodimer-finder.py on type 2 ORIs, analyze this data and maybe put together with type 1
+
+# Jul 28, 2025:
+- Split cooccurence into batch jobs, once they finish running stitch all the matrices together
+- Most important: work on slides
+
+
+# Jul 29, 2025:
+- BLAST ORI identification script is wrong... fix this bc each plasmid is only associated with 1 ORI rn
+  - Don't know where the bug is :( go through each step or maybe start from scratch
 
 

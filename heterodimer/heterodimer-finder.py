@@ -5,6 +5,8 @@
 import pandas as pd
 import os
 import sys
+from tqdm import tqdm
+
 
 ### implementation for running on a single plasmid (for snakemake) ###
 def single(path, plasmid):
@@ -43,7 +45,7 @@ def count(ins_seq_df, ori_df, output):
     # determine sequential order of features + number of class changes + output seqID
     total = 0
     plasmids = 0
-    for id in df["seqID"].unique():
+    for id in tqdm(df["seqID"].unique()):
         plasmid_df = df[df.seqID == id]
         plasmid_df = plasmid_df.sort_values("begin")
         is_only = plasmid_df[plasmid_df.type == "is"] 
@@ -99,9 +101,9 @@ def aggregated(FILE, OUTPUT_NUM):
         PLASMIDS = [line.strip() for line in f if line.strip()]
     ins_seq_df = pd.DataFrame(columns=['qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore', 'group', 'copies'])
     ori_df = pd.DataFrame(columns=['Accession_Number', 'Evidence', 'Type', 'Intergenic_Start', 'Intergenic_End', 'Intergenic_Sequence', 'Iteron_Entropy_Score', 'Iteron_df', 'Pattern_Score', 'Pattern_Df', 'AT_Score', 'AT_Df', 'RNA_df', 'Total_Score', 'Sum_Score', 'gene', 'gene_id', 'gene_start', 'gene_end', 'mmseqs_hit', 'seqID'])
-    for PLASMID in PLASMIDS:
+    for PLASMID in tqdm(PLASMIDS):
         IS_PATH = f"heterodimer/final/{PLASMID}.blast.tsv"
-        ORI_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.csv"
+        ORI_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.2.csv"
         if (os.path.getsize(IS_PATH) != 0) and (os.path.getsize(ORI_PATH) != 0):
             ins_seq_df = pd.concat([ins_seq_df,pd.read_csv(IS_PATH, sep='\t')], ignore_index=True)
             ori_df = pd.concat([ori_df,pd.read_csv(ORI_PATH, sep='\t')], ignore_index=True)
