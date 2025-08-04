@@ -467,3 +467,6 @@ To Do:
   - Don't know where the bug is :( go through each step or maybe start from scratch
 
 
+# Aug 4, 2025:
+- For identifying ORIs, use the mmseqs clustering approach (maybe back to 90% identity, 80% coverage) and BLAST the representative seqs of the clusters against OriVFinder DB
+  - BLASTing ORI seqs against OriVFinder DB did not work as there are many more de novo predictions that expected.

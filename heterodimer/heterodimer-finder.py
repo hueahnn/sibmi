@@ -114,6 +114,7 @@ def aggregated(FILE, OUTPUT_NUM):
     IS_OUTPUT = "IS.summary.tsv"
     ins_seq_df.to_csv(IS_OUTPUT, sep="\t", index=False)
     # put together ORI data
+    ori_df = ori_df[ori_df[""]]
     ori_df = ori_df.rename(columns={"Intergenic_Start":"begin", "Intergenic_End":"end", "Accession_Number":"feature"})
     ori_df["type"] = "ori"
     ORI_OUTPUT = "ORI.summary.tsv"
@@ -137,7 +138,7 @@ def final_df():
     PLASMIDS = df["Plasmid_ID"]
 
     # append AMRs
-    for plasmid in PLASMIDS:
+    for plasmid in tqdm(PLASMIDS):
         path = f"../analysis/outputs/AMRs/{plasmid}.AMRs.tsv"
         if os.path.exists(path):
             amr = pd.read_csv(path, sep="\t")
@@ -175,6 +176,22 @@ def num_ins_seqs(FILE, DF):
         main_df.loc[main_df["Plasmid_ID"]==plasmid, "num_IS"] = insseq
     main_df.to_csv(DF, sep="\t", index=False)
 
+# how many AMRs does each plasmid have? input file DF
+def num_AMRs(FILE):
+    OUTPUT_FILE = f"../073025_final_df.tsv"
+    df = pd.read_csv(FILE, sep="\t")
+    df["num_AMRs"] = 0
+    PLASMIDS = df["Plasmid_ID"]
+
+    # append num AMRs
+    for plasmid in tqdm(PLASMIDS):
+        path = f"../analysis/outputs/AMRs/{plasmid}.AMRs.tsv"
+        if os.path.exists(path):
+            amr = pd.read_csv(path, sep="\t")
+            if not amr.empty:
+                count = len(amr)
+                df.loc[df["Plasmid_ID"]==plasmid, "num_AMRs"] = count
+    df.to_csv(OUTPUT_FILE, sep="\t")    
 
 
 

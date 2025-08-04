@@ -1,0 +1,27 @@
+# author: hueahnn
+# begin: 07/17/2025
+# updated: 07/17/2025
+# purpose: Snakefile for downstream analysis of heterodimer results
+
+import os
+INPUT_PATH = "../filtered.plasmid.fasta.txt"
+PATH = "outputs"
+# PLASMIDS = [f.replace(".fasta", "") for f in os.listdir(INPUT_PATH) if f.endswith(".fasta")]
+PLASMIDS = []
+with open(INPUT_PATH, "r") as f:
+    PLASMIDS = [line.strip() for line in f if line.strip()]
+
+def main_dir(child):
+    return os.path.join(PATH, child)
+
+rule all:
+    input:
+        expand(main_dir("AMRs/{plasmid}.AMRs.tsv"), plasmid=PLASMIDS) # rule amrfinder
+        # expand() # rule mobfinder
+
+rule amrfinder:
+    input: 
+        lambda wildcards: f"../fasta-files/{wildcards.plasmid.split('_')[0]}/fasta/{wildcards.plasmid}.fasta"
+    output: main_dir("AMRs/{plasmid}.AMRs.tsv")
+    conda: "../conda-envs/analysis.yaml"
+    shell: "amrfinder -n {input} -o {output} -d /home/hua575/miniconda3/envs/analysis/share/amrfinderplus/data/2025-07-16.1"

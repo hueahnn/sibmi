@@ -7,6 +7,13 @@ import pandas as pd
 import os
 import sys
 import csv
+from tqdm import tqdm
+from Bio import SeqIO
+from collections import Counter
+import numpy as np
+from itertools import combinations_with_replacement
+
+
 
 def multiple(PLASMID_PATH):
     OUTPUT_PATH = f"mORIs.summary.tsv"
@@ -76,7 +83,7 @@ def cleanup_orivfinder_multiple(FILE):
     with open(FILE, "r") as f:
         PLASMIDS = [line.strip() for line in f if line.strip()]
     for PLASMID in PLASMIDS:
-        OUTPUT_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.2.csv"
+        OUTPUT_PATH = f"heterodimer/final/{PLASMID}.All.IGSs.3.csv"
         open(OUTPUT_PATH, "w").close()
         PATH = f"heterodimer/ORIs/{PLASMID}/"
         input_file = os.path.join(PATH, "All_IGSs.csv")
@@ -87,14 +94,14 @@ def cleanup_orivfinder_multiple(FILE):
             continue
         # clean up and stitch together igs_df
         igs_df["seqID"] = PLASMID
-        igs_df = igs_df[igs_df.Type==2]
+        igs_df = igs_df[igs_df.Type==3]
         if "Unnamed: 0" in igs_df.columns:
             igs_df = igs_df.drop(columns=["Unnamed: 0"])
         igs_df.to_csv(OUTPUT_PATH, sep="\t", index=False)
 
 
-# convert ORI df to fasta file for clustering with mmseqs2
-def mmseqs(INPUT_FILE, OUTPUT_FILE):
+# convert ORI df to fasta file
+def fasta(INPUT_FILE, OUTPUT_FILE):
     df = pd.read_csv(INPUT_FILE, sep="\t")
     count = 0
     with open(OUTPUT_FILE, "w") as f:
@@ -112,6 +119,13 @@ def identity(FILE):
     df = df.loc[df.groupby("qseqid")["bitscore"].idxmax()]
     df.to_csv(OUTPUT_FILE, sep="\t")
 
+    df = pd.read_csv(FILE, sep="\t")
+    for id in tqdm(range(len(df["qseqid"].unique()))):
+        sub = df[df["qseqid"]==id]
+        sub = sub.sort_values("bitscore", ascending=False)
+        
+    df.to_csv(FILE, sep="\t")
+
 
 # create empty file if missing
 def missing(FILE):
@@ -123,7 +137,6 @@ def missing(FILE):
         dir_path = os.path.dirname(ORI_PATH)
         os.makedirs(dir_path, exist_ok=True)
         open(ORI_PATH, 'a').close()
-
 
 # how many ORIs does each plasmid have?
 def num_origins(FILE):
@@ -151,27 +164,122 @@ def num_origins(FILE, DF):
         main_df.loc[main_df["Plasmid_ID"]==plasmid, "num_ORIs"] = ORIs
     main_df.to_csv(DF, sep="\t", index=False)
 
+
+# join all orivfinder outputs into one df
+def ori_df(FILE):
+    PLASMIDS = []
+    with open(FILE, 'r') as f:
+        PLASMIDS = [line.strip() for line in f if line.strip()]
+    OUTPUT_FILE = "all.ORIs.tsv"
+    df = pd.DataFrame(columns=[])
+    for plasmid in tqdm(PLASMIDS):
+        PATH = f"heterodimer/ORIs/{plasmid}/All_IGSs.csv"
+        if os.path.getsize(PATH) == 0:
+            continue
+        plasmid_df = pd.read_csv(PATH, sep="\t",index_col=False)
+        df = pd.concat([df, plasmid_df], ignore_index=True)
+    df.to_csv(OUTPUT_FILE, sep="\t", index=False)
+
+
+# joining all the final ORI data into one df
 def origin_df(FILE):
     PLASMIDS = []
     with open(FILE, 'r') as f:
         PLASMIDS = [line.strip() for line in f if line.strip()]
-    OUTPUT_FILE = "ORIs.1.2.tsv"
-    ori_df = pd.DataFrame(columns=[])
-    for plasmid in PLASMIDS:
+    OUTPUT_FILE = "ORIs.tsv"
+    ori_list = []
+    for plasmid in tqdm(PLASMIDS):
         PATH1 = f"heterodimer/final/{plasmid}.All.IGSs.csv"
         PATH2 = f"heterodimer/final/{plasmid}.All.IGSs.2.csv"
+        PATH3 = f"heterodimer/final/{plasmid}.All.IGSs.3.csv"
         if os.path.getsize(PATH1) == 0:
             continue
         if os.path.getsize(PATH2) == 0:
             continue
+        if os.path.getsize(PATH3) == 0:
+            continue
         sub1_df = pd.read_csv(PATH1, sep="\t")
         sub2_df = pd.read_csv(PATH2, sep="\t")
+        sub3_df = pd.read_csv(PATH3, sep="\t")
+        ori_list.append(sub1_df)
+        ori_list.append(sub2_df)
+        ori_list.append(sub3_df)
+    ori_df = pd.concat(ori_list, ignore_index=True)
+    ori_df.to_csv(OUTPUT_FILE, sep="\t")
         
 
+# finding the abs freq of each ORI
+def abs_freq(FILE):
+    # list of every ORI in OriVFinder DB
+    ORIs = list(set([record.id for record in SeqIO.parse("../orivfinder/app/OriVDB/OriV.fasta", "fasta")]))
+    # find the absolute freq of each ORI
+    ABS_OUTPUT_FILE = "ORIs.abs.freq.tsv"
+    abs_df = pd.DataFrame(ORIs, columns=["ORI"])
+    abs_df["count"] = 0
+    identified_df = pd.read_csv(FILE, sep="\t")
+    identified_df = identified_df.drop_duplicates()
+    identified_df["id"] = identified_df["qseqid"].str.split(".").str[1]
+    identified_ORIs = identified_df["sseqid"]
+    counts = Counter(identified_ORIs)
+    for ori in tqdm(ORIs):
+        abs_df.loc[abs_df["ORI"]==ori, "count"] = counts[ori]
+    abs_df.to_csv(ABS_OUTPUT_FILE, sep="\t")
 
-# building a cooccurrence matrix for all ORIs
-def cooccurrence():
-    return
+
+# building a co-occurrence matrix for all ORIs, arg: pass in csv of identified ORIs
+def cooccurrence(FILE, COOCCUR_OUTPUT_FILE):
+    # list of every ORI in OriVFinder DB
+    ORIs = list(set([record.id for record in SeqIO.parse("../orivfinder/app/OriVDB/OriV.fasta", "fasta")]))
+    identified_df = pd.read_csv("type.1and2.ORIs.identified.tsv", sep="\t")
+    identified_df["id"] = identified_df["qseqid"].str.split(".").str[0]
+    # co-occurence table
+    matrix = np.zeros((len(ORIs), len(ORIs)))
+    PLASMIDS = []
+    with open(FILE, 'r') as f:
+        PLASMIDS = [line.strip() for line in f if line.strip()]
+    for i in tqdm(range(len(ORIs))):
+        for j in tqdm(range(i,len(ORIs))):
+            count = 0
+            for plasmid in tqdm(PLASMIDS):
+                sub_df = identified_df[identified_df["id"]==plasmid]
+                plasmid_oris = sub_df["sseqid"]
+                if (ORIs[i] in plasmid_oris) and (ORIs[j] in plasmid_oris):
+                    count+=1
+                    continue
+            matrix[i,j] = count
+    matrix_df = pd.DataFrame(matrix)
+    matrix_df.to_csv(COOCCUR_OUTPUT_FILE, sep="\t")
+
+
+# a better implementation for finding the cooccurrences
+def cooccurrence2(FILE, OUTPUT_FILE):
+    # list of every ORI in OriVFinder DB
+    ORIs = list(set([record.id for record in SeqIO.parse("../orivfinder/app/OriVDB/OriV.fasta", "fasta")]))
+    ORI_dict = {ori: i for i, ori in enumerate(ORIs)}
+    identified_df = pd.read_csv("type.1and2.ORIs.identified.tsv", sep="\t")
+    identified_df["id"] = identified_df["qseqid"].str.split("_").str[:2].str.join("_")
+    print(identified_df)
+    # co-occurence table
+    matrix = np.zeros((len(ORIs), len(ORIs)))
+    PLASMIDS = []
+    with open(FILE, 'r') as f:
+        PLASMIDS = [line.strip() for line in f if line.strip()]
+    print(PLASMIDS)
+    for plasmid in tqdm(PLASMIDS):
+        sub_df = identified_df[identified_df["id"]==plasmid]
+        print(sub_df)
+        plasmid_oris = sub_df["sseqid"]
+        pairs = list(combinations_with_replacement(plasmid_oris, 2))
+        for pair in tqdm(pairs):
+            print(pair)
+            ori1 = ORI_dict[pair[0]]
+            ori2 = ORI_dict[pair[1]]
+            matrix[ori1,ori2]+=1
+    matrix_df = pd.DataFrame(matrix)
+    matrix_df.to_csv(OUTPUT_FILE, sep="\t")
+
+
+
 
 
 
@@ -181,8 +289,3 @@ if __name__ == "__main__":
     # args[1] = function name
     # args[2:] = function args : (*unpacked)
     globals()[args[1]](*args[2:])
-
-
-
-
-
