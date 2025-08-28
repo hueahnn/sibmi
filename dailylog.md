@@ -470,3 +470,8 @@ To Do:
 # Aug 4, 2025:
 - For identifying ORIs, use the mmseqs clustering approach (maybe back to 90% identity, 80% coverage) and BLAST the representative seqs of the clusters against OriVFinder DB
   - BLASTing ORI seqs against OriVFinder DB did not work as there are many more de novo predictions that expected.
+
+
+# Aug 28, 2025:
+- Can't access O2 portal --> access revoked?
+- Figure out where I left on the cooccurence table and grouping/clustering origins
