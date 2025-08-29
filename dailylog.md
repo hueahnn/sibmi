@@ -475,3 +475,9 @@ To Do:
 # Aug 28, 2025:
 - Can't access O2 portal --> access revoked?
 - Figure out where I left on the cooccurence table and grouping/clustering origins
+
+
+# Aug 29, 2025:
+- Cluster ORIs with mmseqs2 and see which clusters are identified using BLAST
+  - if this works do a quick analysis of co-occurence using pipeline
+- Email Marisela and ask abt credit
